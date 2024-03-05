@@ -1,4 +1,5 @@
 import React from 'react'
+import withAuth from '../../components/withAuth/withAuth'
 
 const CarListing = () => {
   return (
@@ -6,4 +7,4 @@ const CarListing = () => {
   )
 }
 
-export default CarListing
+export default withAuth(CarListing)

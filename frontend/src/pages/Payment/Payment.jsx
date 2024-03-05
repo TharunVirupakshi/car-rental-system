@@ -1,4 +1,5 @@
 import React from 'react'
+import withAuth from '../../components/withAuth/withAuth'
 
 const Payment = () => {
   return (
@@ -6,4 +7,4 @@ const Payment = () => {
   )
 }
 
-export default Payment
+export default withAuth(Payment)

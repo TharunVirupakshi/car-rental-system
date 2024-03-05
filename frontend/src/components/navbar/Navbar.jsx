@@ -5,6 +5,8 @@ import { Link } from 'react-router-dom';
 import './Navbar.css'
 import { Avatar, Dropdown, Navbar } from 'flowbite-react';
 
+import userSVG from '../../assets/user-128.svg'
+
 const NavigationBar = ({signOutHandler, user}) => {
 
   const handleSignOut = () => {
@@ -23,7 +25,7 @@ const NavigationBar = ({signOutHandler, user}) => {
         arrowIcon={false}
         inline
         label={
-          <Avatar alt="User settings" img="https://flowbite.com/docs/images/people/profile-picture-5.jpg" rounded />
+          <Avatar alt="User settings" img={userSVG} rounded />
         }
       >
         <Dropdown.Header>

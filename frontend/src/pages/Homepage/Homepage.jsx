@@ -1,4 +1,5 @@
 import React from 'react'
+import withAuth from '../../components/withAuth/withAuth'
 
 const Homepage = () => {
   return (
@@ -6,4 +7,4 @@ const Homepage = () => {
   )
 }
 
-export default Homepage
+export default withAuth(Homepage)

@@ -21,6 +21,7 @@ const storeUserDetails = async (userDetails) => {
   }
 };
 
+
 setPersistence(auth, browserSessionPersistence)
   .then(() => {
     // Existing and future Auth states are now persisted in the current
@@ -35,6 +36,18 @@ setPersistence(auth, browserSessionPersistence)
     const errorCode = error.code;
     const errorMessage = error.message;
   });
+
+
+auth.onAuthStateChanged(user => {
+    if(user){
+        console.log('User logged in', user)
+    
+    }else{
+        console.log('User Logged out')
+
+    }
+
+})
 
 
 const signUp = async (email, password) => {
@@ -86,6 +99,8 @@ const signOut = async () => {
 const getCurrentUser = () => {
   return auth.currentUser;
 };
+
+
 
 
 export { signUp, signIn, signOut, getCurrentUser};

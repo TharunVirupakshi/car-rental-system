@@ -1,20 +1,9 @@
-import React from "react";
+import {useState, useEffect} from "react";
 import { Navigate } from "react-router-dom";
 import { auth } from "../../firebase/firebase";
 
 const PrivateRoute = ({ children }) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  useEffect(() => {
-    // Check Firebase authentication state
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      setIsLoggedIn(!!user); // Set isLoggedIn to true if the user is logged in, otherwise false
-    });
-
-    // Cleanup the subscription when the component unmounts
-    return () => unsubscribe();
-  }, [auth]);
-    
+  const isLoggedIn = !!auth.currentUser
   if (!isLoggedIn) {
     return <Navigate to="/authpage" />;
   }

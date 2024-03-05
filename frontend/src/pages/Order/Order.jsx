@@ -1,4 +1,5 @@
 import React from 'react'
+import withAuth from '../../components/withAuth/withAuth'
 
 const Order = () => {
   return (
@@ -6,4 +7,4 @@ const Order = () => {
   )
 }
 
-export default Order
+export default withAuth(Order)

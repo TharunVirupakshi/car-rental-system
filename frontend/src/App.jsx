@@ -7,6 +7,7 @@ import {auth} from './firebase/firebase'
 import { onAuthStateChanged } from "firebase/auth";
 import {Navbar} from './components'
 import {signOut} from './middleware/AuthService'
+import PrivateRoute from './components/privateRoute/PrivateRoute';
 
 
 
@@ -21,24 +22,19 @@ function App() {
 
   useEffect(()=>{
 
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
-      setIsLoggedIn(!!user); 
-    });
+    // const unsubscribe = onAuthStateChanged(auth, (user) => {
+    //   setUser(user);
+    //   setIsLoggedIn(!!user); 
+    // });
     const user = auth.currentUser;
-
+    setUser(user)
     setIsLoggedIn(!!user);
-    return () => unsubscribe();
+    // return () => unsubscribe();
      
-  },[auth])
+  })
 
-  useEffect(()=>{
-   if(!isLoggedIn){
-    navigte('/authpage')
-   } 
-  },[isLoggedIn])
 
-  
+   
 
 
 
@@ -48,7 +44,12 @@ function App() {
   
      {isLoggedIn && <Navbar signOutHandler={signOut} user={user}/>}
      <Routes>
-          <Route path="/" exact element={<Homepage />} />
+          <Route path="/" exact element={
+            <PrivateRoute>
+              <Homepage />
+            </PrivateRoute>
+            } 
+          />
           <Route path="/car-listing" element={<CarListing />} />
           <Route path="/order" element={<Order />} />
           <Route path="/payment" element={<Payment />} />
