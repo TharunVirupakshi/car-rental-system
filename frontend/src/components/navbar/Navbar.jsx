@@ -5,7 +5,12 @@ import { Link } from 'react-router-dom';
 import './Navbar.css'
 import { Avatar, Dropdown, Navbar } from 'flowbite-react';
 
-const NavigationBar = () => {
+const NavigationBar = ({signOutHandler, user}) => {
+
+  const handleSignOut = () => {
+    signOutHandler()
+  }
+
   return (
 
     <Navbar fluid rounded>
@@ -22,14 +27,14 @@ const NavigationBar = () => {
         }
       >
         <Dropdown.Header>
-          <span className="block text-sm">Bonnie Green</span>
-          <span className="block truncate text-sm font-medium">name@flowbite.com</span>
+          <span className="block text-sm">{user?.displayName}</span>
+          <span className="block truncate text-sm font-medium">{user?.email}</span>
         </Dropdown.Header>
         <Dropdown.Item>Dashboard</Dropdown.Item>
         <Dropdown.Item>Settings</Dropdown.Item>
         <Dropdown.Item>Earnings</Dropdown.Item>
         <Dropdown.Divider />
-        <Dropdown.Item>Sign out</Dropdown.Item>
+        <Dropdown.Item onClick={handleSignOut}>Sign out</Dropdown.Item>
       </Dropdown>
       <Navbar.Toggle />
     </div>
