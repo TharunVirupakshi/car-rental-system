@@ -50,7 +50,7 @@ auth.onAuthStateChanged(user => {
 })
 
 
-const signUp = async (email, password) => {
+const signUp = async (email, password, name, address, contactNum) => {
   try {
     const userCred = await createUserWithEmailAndPassword(auth, email, password)
 
@@ -59,7 +59,8 @@ const signUp = async (email, password) => {
         custID : user.uid,
         name : name,
         address : address,
-        contactNum : contactNum  
+        contactNum : contactNum,
+        email: email  
     }
 
     await storeUserDetails(userDetails)
@@ -72,7 +73,7 @@ const signUp = async (email, password) => {
   }
 };
 
-const signIn = async (email, password, name, address, contactNum) => {
+const signIn = async (email, password) => {
   try {
     const userCred = await signInWithEmailAndPassword(auth, email, password);
     const user = userCred.user;
