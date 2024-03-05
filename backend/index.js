@@ -1,8 +1,14 @@
 // Example using Express.js
 const express = require('express');
 const bodyParser = require('body-parser');
+const cors = require('cors')
+
 const app = express();
+app.use(cors()); // Enable CORS for all routes
+
 const mysql = require('mysql');
+
+
 var db = mysql.createConnection({
     host: "localhost",
     user: "root",
