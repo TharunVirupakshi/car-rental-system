@@ -42,7 +42,10 @@ function App() {
     <>
      
   
-     {isLoggedIn && <Navbar signOutHandler={signOut} user={user}/>}
+     {isLoggedIn ? <Navbar signOutHandler={signOut} user={user}/> : 
+     <div className='flex w-screen'>
+      <span className='text-2xl font-semibold dark:text-white p-5'>RentCarz</span>
+     </div>}
      <Routes>
           <Route path="/" exact element={
             <PrivateRoute>
@@ -50,7 +53,7 @@ function App() {
             </PrivateRoute>
             } 
           />
-          <Route path="/car-listing" element={<CarListing />} />
+          {/* <Route path="/car-listing" element={<CarListing />} /> */}
           <Route path="/order" element={<Order />} />
           <Route path="/payment" element={<Payment />} />
           <Route path="/authpage" element={<AuthPage />} />

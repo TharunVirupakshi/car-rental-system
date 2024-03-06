@@ -48,9 +48,12 @@ const AuthPage = () => {
 
 
   return (
-    <div className='flex w-screen h-screen justify-center items-center'>
-       <form className="flex flex-col gap-4 w-96">
+    <div className='flex w-screen h-screen justify-center'>
 
+      
+
+       <form className="flex flex-col gap-4 w-96 my-16">
+       <h1 class="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white">Welcome!</h1>
         {isSignUp ? (
           <div>
             <div className="mb-2 block">
