@@ -1,8 +1,11 @@
 import {useEffect, useState} from 'react'
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import APIService from '../../middleware/APIService';
 import carImg from '../../assets/maruti-suzuki-fronx-splendid-silver-with-bluish-black.jpg'
 import { Button } from 'flowbite-react';
+
+
+
 const ProductPage = () => {
   const { productID } = useParams();
   const [ carData, setCarData] = useState([])
@@ -58,8 +61,9 @@ const ProductPage = () => {
                 </svg>
             </a> */}
             <div className="mt-5">
-
-            <Button>Rent</Button>
+                <Link to={`/order/${carData?.vehicleNo}`}>
+                    <Button>Rent</Button>
+                </Link>
             </div>
            
 
