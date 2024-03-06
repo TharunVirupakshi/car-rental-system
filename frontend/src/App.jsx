@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import './App.css'
 
 import {Navigate, Route, Routes, useNavigate} from 'react-router-dom';
-import { CarListing, Homepage, Order, Payment, AuthPage } from './pages';
+import { CarListing, Homepage, Order, Payment, AuthPage, ProductPage } from './pages';
 import {auth} from './firebase/firebase'
 import { onAuthStateChanged } from "firebase/auth";
 import {Navbar} from './components'
@@ -53,8 +53,9 @@ function App() {
             </PrivateRoute>
             } 
           />
+          <Route path="/product/:productID" element={<PrivateRoute> <ProductPage/> </PrivateRoute>}/>
           {/* <Route path="/car-listing" element={<CarListing />} /> */}
-          <Route path="/order" element={<Order />} />
+          <Route path="/order" element={<PrivateRoute><Order/></PrivateRoute>} />
           <Route path="/payment" element={<Payment />} />
           <Route path="/authpage" element={<AuthPage />} />
      </Routes>

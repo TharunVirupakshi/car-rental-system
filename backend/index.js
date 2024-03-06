@@ -69,6 +69,26 @@ app.get('/api/getCars', (req, res) => {
 });
 
 
+app.get('/api/getCar', (req, res)=>{
+    
+    const vehicleNo = req.query.vehicleNo;
+
+    const sql = `SELECT * FROM car, location WHERE car.vehicleNo = '${vehicleNo}' AND car.locationID = location.locationID`
+
+
+    // Perform SQL database query
+    db.query(sql, (err, result) => {
+        if (err) {
+        console.error(`Error fetching car with ID ${vehicleNo}  from MySQL:`, err.message);
+        res.status(500).json({ error: 'Internal Server Error' });
+        } else {
+        console.log('Cars fetched from MySQL:', result);
+        res.json(result);
+        }
+    });
+})
+
+
 // Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

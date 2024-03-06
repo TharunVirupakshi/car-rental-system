@@ -18,6 +18,17 @@ const APIService = {
       throw error;
     }
   },
+  getCar: async(vehicleNo) => {
+    try {
+      console.log('Getting car ', vehicleNo)
+      const response = await api.get('/api/getCar', { params: {vehicleNo}});
+      console.log('Got car: ', response.data)
+      return response.data
+    } catch (error) {
+    console.error('Error fetching car:', error.message);
+    throw error; 
+    }
+  }
 };
 
 export default APIService;
