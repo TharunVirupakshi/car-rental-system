@@ -47,7 +47,7 @@ function App() {
       <span className='text-2xl font-semibold dark:text-white p-5'>RentCarz</span>
      </div>}
      <Routes>
-          <Route path="/" exact element={
+          <Route path="/" element={
             <PrivateRoute>
               <Homepage />
             </PrivateRoute>

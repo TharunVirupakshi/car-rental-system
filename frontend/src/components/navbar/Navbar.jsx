@@ -14,7 +14,7 @@ const NavigationBar = ({signOutHandler, user}) => {
   }
 
   return (
-
+ 
     <Navbar fluid rounded>
     <Navbar.Brand href="/">
       {/* <img src="/favicon.svg" className="mr-3 h-6 sm:h-9" alt="Flowbite React Logo" /> */}
@@ -41,7 +41,7 @@ const NavigationBar = ({signOutHandler, user}) => {
       <Navbar.Toggle />
     </div>
     <Navbar.Collapse>
-      <Navbar.Link href="#" active>
+      <Navbar.Link href="/" active>
         Home
       </Navbar.Link>
       <Navbar.Link href="#">About</Navbar.Link>
