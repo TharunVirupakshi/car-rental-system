@@ -48,6 +48,27 @@ app.post('/api/store-user', (req, res) => {
   });
 });
 
+
+
+
+// API endpoint to fetch cars from the 'car' table
+app.get('/api/getCars', (req, res) => {
+  // SQL query to select all cars from the 'car' table
+  const sql = 'SELECT * FROM car, location WHERE car.locationID = location.locationID';
+
+  // Perform SQL database query
+  db.query(sql, (err, result) => {
+    if (err) {
+      console.error('Error fetching cars from MySQL:', err.message);
+      res.status(500).json({ error: 'Internal Server Error' });
+    } else {
+      console.log('Cars fetched from MySQL:', result);
+      res.json(result);
+    }
+  });
+});
+
+
 // Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
