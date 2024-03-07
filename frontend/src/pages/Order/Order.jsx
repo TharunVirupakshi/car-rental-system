@@ -1,6 +1,6 @@
 import {useEffect, useState} from 'react'
 import withAuth from '../../components/withAuth/withAuth'
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import APIService from '../../middleware/APIService';
 import { Button } from 'flowbite-react';
 import { Label, TextInput } from 'flowbite-react';
@@ -28,7 +28,9 @@ const Order = () => {
 
   const [couponCode, setCouponCode] = useState('')
 
+  const navigate = useNavigate()
 
+  //Fetch the car details
   useEffect(() => {
 
     const fetchData = async () => {
@@ -55,7 +57,7 @@ const Order = () => {
 
   
   const handleCreateOrder = ()=>{
-    const fetchData = async () => {
+    const makeReq = async () => {
       try {
         const id = auth.currentUser.uid;
         const orderDetails = {
@@ -66,13 +68,18 @@ const Order = () => {
         }
         const data = await APIService.createOrder(orderDetails);
         console.log('(Order) car: ',  data);
-        setCarData(data[0]);
+
+        navigate('/payment', { state: { orderId: data?.order?.insertId, totalCost: totalCost, custID: orderDetails.custID } })
+
       } catch (error) {
         console.error('(Order) Error fetching car    :', error.message);
       }
     };
 
-    fetchData(); 
+    makeReq(); 
+
+
+
   }
 
 
@@ -80,20 +87,20 @@ const Order = () => {
   <div className='p-10'>
   <div className="title ">
     <h2 className="text-4xl font-extrabold dark:text-white">Order Page</h2>
-  </div>¯
+  </div>
   <div className="product-details p-10">
-                <dl class="max-w-md text-gray-900 divide-y divide-gray-200 dark:text-white dark:divide-gray-700 mt-5">
-                    <div class="flex flex-col pb-3">
-                        <dt class="mb-1 text-gray-500 md:text-lg dark:text-gray-400">Model</dt>
-                        <dd class="text-lg font-semibold">{carData?.model ?? 'model name'}</dd>
+                <dl className="max-w-md text-gray-900 divide-y divide-gray-200 dark:text-white dark:divide-gray-700 mt-5">
+                    <div className="flex flex-col pb-3">
+                        <dt className="mb-1 text-gray-500 md:text-lg dark:text-gray-400">Model</dt>
+                        <dd className="text-lg font-semibold">{carData?.model ?? 'model name'}</dd>
                     </div>
-                    <div class="flex flex-col pb-3">
-                        <dt class="mb-1 text-gray-500 md:text-lg dark:text-gray-400">Type</dt>
-                        <dd class="text-lg font-semibold">{carData?.carType ?? 'car type'}</dd>
+                    <div className="flex flex-col pb-3">
+                        <dt className="mb-1 text-gray-500 md:text-lg dark:text-gray-400">Type</dt>
+                        <dd className="text-lg font-semibold">{carData?.carType ?? 'car type'}</dd>
                     </div>
-                    <div class="flex flex-col py-3">
-                        <dt class="mb-1 text-gray-500 md:text-lg dark:text-gray-400">Location</dt>
-                        <dd class="text-lg font-semibold">{carData?.branchName ?? 'branch name'} - {carData?.address ?? ' '}</dd>
+                    <div className="flex flex-col py-3">
+                        <dt className="mb-1 text-gray-500 md:text-lg dark:text-gray-400">Location</dt>
+                        <dd className="text-lg font-semibold">{carData?.branchName ?? 'branch name'} - {carData?.address ?? ' '}</dd>
                     </div>
                   
                 </dl>
@@ -128,9 +135,9 @@ const Order = () => {
               required  
               />
 
-            <div class="flex flex-col pb-3 mt-5">
-                        <dt class="mb-1 text-gray-500 md:text-lg dark:text-gray-400">Estimated Price: </dt>
-                        <dd class="text-lg font-semibold">₹{estimatedPrice ?? '0.0'}</dd>
+            <div className="flex flex-col pb-3 mt-5">
+                        <dt className="mb-1 text-gray-500 md:text-lg dark:text-gray-400">Estimated Price: </dt>
+                        <dd className="text-lg font-semibold">₹{estimatedPrice ?? '0.0'}</dd>
             </div>
            </>)} {isPaymentModeOn && (
            <>
@@ -146,10 +153,10 @@ const Order = () => {
              
               />
 
-            <div class="flex flex-col pb-3 mt-5">
-                        <dt class="mb-1 text-gray-500 md:text-lg dark:text-gray-400">Price: </dt>
+            <div className="flex flex-col pb-3 mt-5">
+                        <dt className="mb-1 text-gray-500 md:text-lg dark:text-gray-400">Price: </dt>
                         <p className='text-sm text-green-500'>{couponCode === COUPON && 'Discount Applied: -₹'+ estimatedPrice*0.2}</p>
-                        <dd class="text-lg font-semibold">₹{totalCost}</dd>
+                        <dd className="text-lg font-semibold">₹{totalCost}</dd>
             </div>
            </>)
            }
@@ -161,9 +168,9 @@ const Order = () => {
             <div className="mt-5">
                 
                     {!isPaymentModeOn ? 
-                      <Button onClick={()=>{setIsPaymentModeOn(true); setActiveStep(1)}}>Proceed to payment</Button> : <div className='flex gap-5'>
+                      <Button onClick={()=>{setIsPaymentModeOn(true); setActiveStep(1)}}>Next</Button> : <div className='flex gap-5'>
                       <Button onClick={()=>{setIsPaymentModeOn(false);  setActiveStep(0)}}>Go back</Button> 
-                      <Button onClick={handleCreateOrder} className="w-40" color='success'>Pay</Button> 
+                      <Button onClick={handleCreateOrder} className="w-40" color='success'>Complete Order</Button> 
    
                       </div>
                       

@@ -74,7 +74,7 @@ const ProductPage = () => {
         </div>
 
 
-        
+{/*         
           <div >
             <p>Vehicle No: {carData.vehicleNo}</p>
             <p>Car Type: {carData.carType}</p>
@@ -84,7 +84,7 @@ const ProductPage = () => {
             <p>Address: {carData.address}</p>
             <hr />
           </div>
-    
+     */}
 
 
 

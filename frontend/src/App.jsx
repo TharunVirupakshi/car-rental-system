@@ -56,7 +56,7 @@ function App() {
           <Route path="/product/:productID" element={<PrivateRoute> <ProductPage/> </PrivateRoute>}/>
           {/* <Route path="/car-listing" element={<CarListing />} /> */}
           <Route path="/order/:productID" element={<PrivateRoute><Order/></PrivateRoute>} />
-          <Route path="/payment" element={<Payment />} />
+          <Route path="/payment" element={<PrivateRoute><Payment /></PrivateRoute>} />
           <Route path="/authpage" element={<AuthPage />} />
      </Routes>
 

@@ -38,9 +38,21 @@ const APIService = {
       } catch (error) {
       console.error('Error creating ORDER:', error.message);
       throw error; 
-      } 
+      }   
+    },
+    createPayment: async(data)=>{
+      try {
+          const {orderID, custID, totCost, paymentMethod} = data
+          console.log('Processing payment ', data)
+          const response = await api.post('/api/createPayment', {orderID, custID, totCost, paymentMethod}) 
+          return response.data
+      } catch (error) {
+        console.error('Error processing payment:', error.message);
+        throw error;  
+      }
+    }
 
-  }
+    
 };
 
 export default APIService;
