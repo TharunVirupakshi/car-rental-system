@@ -164,7 +164,8 @@ app.post('/api/createPayment', async(req, res)=>{
                         console.error('Error processing payment', err.message);
                         res.status(500).json({ success: false, error: 'Internal Server Error' });
                     }else{
-                        res.status(201).json({ success: true, payment: result }); 
+                        res.status(201).json({ success: true, payment: result });
+
                     }
                 })
             }
@@ -175,6 +176,8 @@ app.post('/api/createPayment', async(req, res)=>{
         res.status(500).json({ success: false, error: 'Internal Server Error' });
     }
 })
+
+
 
 //Create Trip
 app.post('/api/createTrip', (req, res) => {
@@ -224,7 +227,7 @@ app.post('/api/createTrip', (req, res) => {
           return res.status(500).json({ error: 'Internal Server Error' });
         }
   
-        res.status(201).json({ success: true, tripID: insertResult.insertId });
+        res.status(201).json({ success: true, result: insertResult });
       });
         // details = result[0]
 
@@ -236,7 +239,39 @@ app.post('/api/createTrip', (req, res) => {
 
       
     });
-  });
+});
+
+//fetch trips
+app.get('/api/getAllTrips', (req, res)=>{
+    try {
+        const {custID} = req.body
+          // Fetch trips based on custID
+        const fetchTripsSQL = `
+        SELECT *
+        FROM getsRented
+        WHERE orderID IN (
+        SELECT orderID
+        FROM rentalOrder
+        WHERE custID = ?
+        )
+    `;
+
+    db.query(fetchTripsSQL, [custID], (fetchErr, result) => {
+        if (fetchErr) {
+          console.error('Error fetching trips:', fetchErr.message);
+          return res.status(500).json({ success: false, error: 'Internal Server Error' });
+        }
+  
+        res.status(200).json({ success: true, trips: result });
+      });
+
+
+
+    } catch (error) {
+        console.error('Error fetching trips:', error.message);
+        res.status(500).json({ success: false, error: 'Internal Server Error' });
+    }
+})
   
 
 // Start the server

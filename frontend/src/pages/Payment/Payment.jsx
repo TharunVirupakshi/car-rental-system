@@ -1,6 +1,6 @@
 import React from 'react'
 import withAuth from '../../components/withAuth/withAuth'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { Button } from 'flowbite-react'
 import { HiOutlineArrowRight, HiShoppingCart } from 'react-icons/hi';
 import { useState } from 'react';
@@ -14,6 +14,8 @@ const Payment = () => {
   const [paymentData, setPaymentData] = useState(null)
   const [method, setMethod] = useState('credit')
 
+  const navigate = useNavigate()
+
   useEffect(()=>{
     const data = location.state
     setPaymentData(data)
@@ -26,7 +28,6 @@ const Payment = () => {
     try {
       if (paymentData?.orderId && paymentData?.totalCost && paymentData?.custID) {
     
-
       console.log('Payment Data sending', paymentData);
       const response = await APIService.createPayment({
         orderID: paymentData.orderId,
@@ -34,7 +35,17 @@ const Payment = () => {
         paymentMethod: method,
         custID: paymentData.custID,
       });
-      console.log('Payment success....', response);
+      console.log('Payment status....', response);
+
+      if(response.success)  alert('Payment Success')
+
+      //Create Trip....
+    
+      const res = await APIService.createTrip({orderID: paymentData.orderId})
+
+      navigate('/mytrips')
+      
+      
     } else {
       console.log('Missing required properties in paymentData');
     }

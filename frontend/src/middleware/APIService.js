@@ -40,7 +40,7 @@ const APIService = {
       throw error; 
       }   
     },
-    createPayment: async(data)=>{
+ createPayment: async(data)=>{
       try {
           const {orderID, custID, totCost, paymentMethod} = data
           console.log('Processing payment ', data)
@@ -50,7 +50,24 @@ const APIService = {
         console.error('Error processing payment:', error.message);
         throw error;  
       }
+    },
+    createTrip: async({orderID})=>{
+        try {
+          console.log('Creating Trip', orderID)
+          if(orderID === undefined || !orderID){
+            console.error('cannot create trip')
+            return
+          }
+          const response = await api.post('/api/createTrip', {orderID}) 
+          console.log('Trip Details: ', response.data)
+          return response.data
+            
+        } catch (error) {
+            console.error('Error creating order:', error.message);
+            throw error;  
+        }
     }
+
 
     
 };

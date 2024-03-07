@@ -32,16 +32,16 @@ const NavigationBar = ({signOutHandler, user}) => {
           <span className="block text-sm">{user?.displayName}</span>
           <span className="block truncate text-sm font-medium">{user?.email}</span>
         </Dropdown.Header>
-        <Dropdown.Item>Dashboard</Dropdown.Item>
+        <Dropdown.Item>MyTrips</Dropdown.Item>
+        <Dropdown.Item>MyOrders</Dropdown.Item>
         <Dropdown.Item>Settings</Dropdown.Item>
-        <Dropdown.Item>Earnings</Dropdown.Item>
         <Dropdown.Divider />
         <Dropdown.Item onClick={handleSignOut}>Sign out</Dropdown.Item>
       </Dropdown>
       <Navbar.Toggle />
     </div>
     <Navbar.Collapse>
-      <Navbar.Link href="/" active>
+      <Navbar.Link href="/home" active>
         Home
       </Navbar.Link>
       <Navbar.Link href="#">About</Navbar.Link>
