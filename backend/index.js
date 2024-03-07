@@ -7,6 +7,7 @@ const app = express();
 app.use(cors()); // Enable CORS for all routes
 
 const mysql = require('mysql');
+const { json } = require('express');
 
 
 var db = mysql.createConnection({
@@ -48,9 +49,6 @@ app.post('/api/store-user', (req, res) => {
   });
 });
 
-
-
-
 // API endpoint to fetch cars from the 'car' table
 app.get('/api/getCars', (req, res) => {
   // SQL query to select all cars from the 'car' table
@@ -86,6 +84,54 @@ app.get('/api/getCar', (req, res)=>{
         res.json(result);
         }
     });
+})
+
+
+app.post('/api/createOrder', async(req, res)=>{
+    try {
+        const { carID, custID, discountID, totCost } = req.body;
+
+        const sql = 'INSERT INTO rentalOrder (carID, custID, asstID, discountID, totCost, orderDate) VALUES(?,?,?,?,?,?)'
+       
+        // Assign tripAsst
+          // Fetch a random assistant from the tripAsst table
+        const assignAsst = 'SELECT * FROM tripAsst ORDER BY RAND() LIMIT 1';
+
+        db.query(assignAsst, (err, result) => {
+            if (err) {
+                console.error('Error assigning trip assistant:', err.message);
+                    res.status(500).json({ success: false, error: 'Internal Server Error' });
+                } else {
+                    const assistant = result[0]; // Assuming the result is an array, and you want the first assistant
+                    const asstID = assistant ? assistant.asstID : null;
+                    console.log('Assigned asst: ', asstID)
+                    if(asstID){
+                       // Generate current timestamp formatted for SQL date type
+                    const orderDate = new Date().toISOString().split('T')[0];
+                    const values = [carID, custID, asstID, discountID, totCost, orderDate]
+                    db.query(sql,values , (err, result) => {
+                        if (err) {
+                        console.error('Error creating order:', err.message);
+                        res.status(500).json({ success: false, error: 'Internal Server Error' });
+                        } else {
+                        res.status(201).json({ success: true, order: result });
+                        }
+                    });
+                    }else{
+                       res.status(500).json({ success: false, error: 'Internal Server Error' }); 
+                    }
+
+                } 
+        }
+        )
+
+       
+     
+      } catch (error) {
+        console.error('Error creating order:', error.message);
+        res.status(500).json({ success: false, error: 'Internal Server Error' });
+      }
+
 })
 
 
