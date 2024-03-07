@@ -28,6 +28,18 @@ const APIService = {
     console.error('Error fetching car:', error.message);
     throw error; 
     }
+  },
+  createOrder: async({vehicleNo, custID, discountID, totCost})=>{
+    try {
+        console.log('Creating order for car ', vehicleNo)
+        const response = await api.post('/api/createOrder', {carID: vehicleNo, custID, discountID, totCost});
+        console.log('Order created: ', response.data)
+        return response.data
+      } catch (error) {
+      console.error('Error creating ORDER:', error.message);
+      throw error; 
+      } 
+
   }
 };
 

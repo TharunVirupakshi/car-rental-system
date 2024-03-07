@@ -56,7 +56,7 @@ const AuthPage = () => {
        <h1 class="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white">Welcome!</h1>
         {isSignUp ? (
           <div>
-            <div className="mb-2 block">
+            <div className="my-2 block">
               <Label htmlFor="email1" value="Email" />
             </div>
             <TextInput
@@ -67,7 +67,7 @@ const AuthPage = () => {
               onChange={(e) => setEmail(e.target.value)}
               required />
             
-            <div className="mb-2 block">
+            <div className="my-2 block">
               <Label htmlFor="name" value="Name" />
             </div>
             <TextInput
@@ -78,18 +78,18 @@ const AuthPage = () => {
               onChange={(e) => setName(e.target.value)}
               required
             />
-            <div className="mb-2 block">
+            <div className="my-2 block">
               <Label htmlFor="contactNum" value="Contact" />
             </div>
             <TextInput
               id="contactNum"
               type="text"
-              placeholder='Enter your contact number'
+              placeholder='Enter your contact numyer'
               value={contact}
               onChange={(e) => setContact(e.target.value)}
               required
             />
-            <div className="mb-2 block">
+            <div className="my-2 block">
               <Label htmlFor="address" value="Address" />
             </div>
             <TextInput
@@ -101,7 +101,7 @@ const AuthPage = () => {
               required
             />
 
-            <div className="mb-2 block">
+            <div className="my-2 block">
                 <Label htmlFor="password1" value="Password" />
               </div>
               <TextInput
@@ -115,7 +115,7 @@ const AuthPage = () => {
         ) : (
 
           <div>
-            <div className="mb-2 block">
+            <div className="my-2 block">
               <Label htmlFor="email1" value="Email" />
             </div>
             <TextInput
@@ -126,7 +126,7 @@ const AuthPage = () => {
               onChange={(e) => setEmail(e.target.value)}
               required />
             
-              <div className="mb-2 block">
+              <div className="my-2 block">
                 <Label htmlFor="password1" value="Password" />
               </div>
               <TextInput
