@@ -7,6 +7,7 @@ import { Label, TextInput } from 'flowbite-react';
 import { Stepper } from '../../components';
 import { RATE_PER_DAY } from '../../constants';
 import { auth } from '../../firebase/firebase';
+import { Datepicker } from 'flowbite-react';
 const user = auth.currentUser;
 
 
@@ -20,6 +21,8 @@ const Order = () => {
 
   // const [price, setPrice] = useState(0)
   const [days, setDays] = useState(0)
+  const [startDate, setStartDate] = useState(null)
+  const [endDate, setEndDate] = useState(null)
   const [estimatedPrice, setEstimatedPrice] = useState(0)
   const [totalCost, setTotalCost] = useState(0)
 
@@ -46,6 +49,9 @@ const Order = () => {
     fetchData();
   }, [productID])
 
+  useEffect(()=>{
+    console.log("Dates ",startDate, endDate)
+  },[startDate, endDate])
 
   useEffect(()=>{
     setEstimatedPrice(days*RATE_PER_DAY)
@@ -55,6 +61,30 @@ const Order = () => {
     setTotalCost(cost)
   },[estimatedPrice, couponCode])
 
+  const calculateDaysBetween = (start, end) => {
+  if (start && end) {
+    const oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+
+    const daysDifference = Math.round(Math.abs((startDate - endDate) / oneDay));
+
+    // If start and end dates are the same, set days to 1
+    return (daysDifference === 0 ? 1 : daysDifference);
+  }
+};
+
+const handleStartDateChange = (date) => {
+    setStartDate(date);
+    const d = calculateDaysBetween(date, endDate);
+    setDays(d)
+  };
+
+  const handleEndDateChange = (date) => {
+    setEndDate(date);
+    const d = calculateDaysBetween(startDate, date);
+    setDays(d)
+  };
   
   const handleCreateOrder = ()=>{
     const makeReq = async () => {
@@ -123,17 +153,25 @@ const Order = () => {
           
           <div className='max-w-md'>
            {!isPaymentModeOn && (<>
-            <div className="my-5 block">
-              <Label htmlFor="days" value="Days" />
-            </div>
-            <TextInput 
+            
+            {/* <TextInput 
               id="days" 
               type="text"  
               placeholder='Enter total number of days' 
               value={days}
               onChange={(e) => setDays(e.target.value)}
               required  
-              />
+              /> */}
+              <div className="my-5 block">
+              <Label htmlFor="start" value="From" />
+              </div>
+              <Datepicker name='start' minDate={new Date()} autoHide={true} onSelectedDateChanged={handleStartDateChange} />
+              <div className="my-5 block">
+              <Label htmlFor="end" value="To" />
+              </div>
+              <Datepicker name='end' minDate={startDate || new Date()} autoHide={true} onSelectedDateChanged={handleEndDateChange}/>
+
+
 
             <div className="flex flex-col pb-3 mt-5">
                         <dt className="mb-1 text-gray-500 md:text-lg dark:text-gray-400">Estimated Price: </dt>
