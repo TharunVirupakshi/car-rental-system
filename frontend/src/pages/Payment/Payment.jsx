@@ -41,7 +41,7 @@ const Payment = () => {
 
       //Create Trip....
     
-      const res = await APIService.createTrip({orderID: paymentData.orderId})
+      const res = await APIService.createTrip({orderID: paymentData.orderId, rentalStartDate: paymentData.rentalStartDate, rentalEndDate: paymentData.rentalEndDate })
 
       navigate('/mytrips')
       

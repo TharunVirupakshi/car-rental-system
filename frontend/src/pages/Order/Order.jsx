@@ -99,13 +99,18 @@ const Order = () => {
         const orderDetails = {
           vehicleNo: productID,
           custID: id,
-          discountID: couponDetails.discountID || null,
+          discountID: couponDetails?.discountID ?? null,
           totCost: totalCost
         }
         const data = await APIService.createOrder(orderDetails);
         console.log('(Order) car: ',  data);
 
-        navigate('/payment', { state: { orderId: data?.order?.insertId, totalCost: totalCost, custID: orderDetails.custID } })
+        navigate('/payment', { state: { 
+          orderId: data?.order?.insertId, 
+          totalCost: totalCost, custID: orderDetails.custID , 
+          rentalStartDate: startDate.toISOString().slice(0, 19).replace('T', ' '), 
+          rentalEndDate: endDate.toISOString().slice(0, 19).replace('T', ' ')
+        }})
 
       } catch (error) {
         console.error('(Order) Error fetching car    :', error.message);

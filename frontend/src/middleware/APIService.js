@@ -51,14 +51,14 @@ const APIService = {
         throw error;  
       }
     },
-    createTrip: async({orderID})=>{
+    createTrip: async({orderID, rentalStartDate, rentalEndDate})=>{
         try {
           console.log('Creating Trip', orderID)
           if(orderID === undefined || !orderID){
             console.error('cannot create trip')
             return
           }
-          const response = await api.post('/api/createTrip', {orderID}) 
+          const response = await api.post('/api/createTrip', {orderID, rentalStartDate, rentalEndDate }) 
           console.log('Trip Details: ', response.data)
           return response.data
             

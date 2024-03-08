@@ -205,7 +205,7 @@ app.post('/api/createPayment', async(req, res)=>{
 //Create Trip
 app.post('/api/createTrip', async(req, res) => {
     try {
-    const { orderID } = req.body;
+    const { orderID, rentalStartDate, rentalEndDate } = req.body;
   
     // Step 1: Fetch the most recent payment for the given orderID
     const fetchPaymentSQL = `
@@ -245,7 +245,7 @@ app.post('/api/createTrip', async(req, res) => {
         VALUES (?, ?, ?, ?)
       `;
 
-      db.query(insertTripSQL, [orderDetails.carID, orderID, null, null], (insertErr, insertResult) => {
+      db.query(insertTripSQL, [orderDetails.carID, orderID, rentalStartDate, rentalEndDate], (insertErr, insertResult) => {
         if (insertErr) {
           console.error('Error creating trip:', insertErr.message);
           return res.status(500).json({ error: 'Internal Server Error' });
