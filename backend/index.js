@@ -71,11 +71,11 @@ app.get('/api/getCar', (req, res)=>{
     
     const vehicleNo = req.query.vehicleNo;
 
-    const sql = `SELECT * FROM car, location WHERE car.vehicleNo = '${vehicleNo}' AND car.locationID = location.locationID`
+    const sql = `SELECT * FROM car, location WHERE car.vehicleNo = ? AND car.locationID = location.locationID`
 
 
     // Perform SQL database query
-    db.query(sql, (err, result) => {
+    db.query(sql,[vehicleNo] ,(err, result) => {
         if (err) {
         console.error(`Error fetching car with ID ${vehicleNo}  from MySQL:`, err.message);
         res.status(500).json({ error: 'Internal Server Error' });
@@ -134,6 +134,29 @@ app.post('/api/createOrder', async(req, res)=>{
 
 })
 
+app.get('/api/getCoupon', (req, res)=>{
+    const couponCode = req.query.couponCode
+
+    const sql = 'SELECT * FROM discount WHERE couponCode = ?'
+
+    db.query(sql, [couponCode], (err, result)=>{
+        if (err) {
+            console.error(`Error fetching coupon with code ${couponCode} from MySQL:`, err.message);
+            res.status(500).json({ error: 'Internal Server Error' });
+        } else {
+            if (result.length === 0) {
+                // Coupon does not exist
+                console.log('Coupon not found.');
+                res.status(404).json({ error: 'Coupon not found' });
+            } else {
+                // Coupon exists
+                console.log('Coupon fetched from MySQL:', result);
+                res.json(result);
+            }
+        }
+    })
+})
+
 
 app.post('/api/createPayment', async(req, res)=>{
     try {
@@ -180,7 +203,8 @@ app.post('/api/createPayment', async(req, res)=>{
 
 
 //Create Trip
-app.post('/api/createTrip', (req, res) => {
+app.post('/api/createTrip', async(req, res) => {
+    try {
     const { orderID } = req.body;
   
     // Step 1: Fetch the most recent payment for the given orderID
@@ -237,12 +261,17 @@ app.post('/api/createTrip', (req, res) => {
     //   const { carID } = details; // Adjust these based on your input
 
 
-      
+    
     });
+    }catch(error){
+        console.error('Error creating trip:', error.message);
+        res.status(500).json({ success: false, error: 'Internal Server Error' });
+    }
+
 });
 
 //fetch trips
-app.get('/api/getAllTrips', (req, res)=>{
+app.get('/api/getAllTrips',async(req, res)=>{
     try {
         const {custID} = req.body
           // Fetch trips based on custID

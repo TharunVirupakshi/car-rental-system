@@ -66,6 +66,16 @@ const APIService = {
             console.error('Error creating order:', error.message);
             throw error;  
         }
+    },
+    getCoupon: async(couponCode)=>{
+        try {
+            const response = await api.get('/api/getCoupon', {params: {couponCode}})
+            console.log('Coupon: ', response.data)
+            return response.data
+        } catch (error) {
+            console.error('Error fetching coupon:', error.message);
+            throw error;   
+        }
     }
 
 

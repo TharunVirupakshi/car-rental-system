@@ -20,9 +20,9 @@ const Order = () => {
   console.log('(Order) id:',productID)
 
   // const [price, setPrice] = useState(0)
-  const [days, setDays] = useState(0)
-  const [startDate, setStartDate] = useState(null)
-  const [endDate, setEndDate] = useState(null)
+  const [days, setDays] = useState(1)
+  const [startDate, setStartDate] = useState(new Date())
+  const [endDate, setEndDate] = useState(new Date())
   const [estimatedPrice, setEstimatedPrice] = useState(0)
   const [totalCost, setTotalCost] = useState(0)
 
@@ -30,7 +30,9 @@ const Order = () => {
   const [activeStep, setActiveStep] = useState(0);
 
   const [couponCode, setCouponCode] = useState('')
-
+  const [isCouponValid, setIsCouponValid] = useState(false)
+  const [couponDetails, setCouponDetails] = useState(null)
+  const [triggered, setTriggered] = useState(false)
   const navigate = useNavigate()
 
   //Fetch the car details
@@ -49,6 +51,8 @@ const Order = () => {
     fetchData();
   }, [productID])
 
+ 
+
   useEffect(()=>{
     console.log("Dates ",startDate, endDate)
   },[startDate, endDate])
@@ -56,10 +60,12 @@ const Order = () => {
   useEffect(()=>{
     setEstimatedPrice(days*RATE_PER_DAY)
   },[days])
+
+  //Apply Discount
   useEffect(()=>{
-    const cost = couponCode === COUPON ? estimatedPrice-(estimatedPrice*0.2) : estimatedPrice
+    const cost = couponDetails ? estimatedPrice-(estimatedPrice*(couponDetails.discountPercent || 0.0)) : estimatedPrice
     setTotalCost(cost)
-  },[estimatedPrice, couponCode])
+  },[estimatedPrice, couponDetails])
 
   const calculateDaysBetween = (start, end) => {
   if (start && end) {
@@ -72,9 +78,9 @@ const Order = () => {
     // If start and end dates are the same, set days to 1
     return (daysDifference === 0 ? 1 : daysDifference);
   }
-};
+  };
 
-const handleStartDateChange = (date) => {
+  const handleStartDateChange = (date) => {
     setStartDate(date);
     const d = calculateDaysBetween(date, endDate);
     setDays(d)
@@ -93,7 +99,7 @@ const handleStartDateChange = (date) => {
         const orderDetails = {
           vehicleNo: productID,
           custID: id,
-          discountID: null,
+          discountID: couponDetails.discountID || null,
           totCost: totalCost
         }
         const data = await APIService.createOrder(orderDetails);
@@ -110,6 +116,23 @@ const handleStartDateChange = (date) => {
 
 
 
+  }
+
+
+  const checkCoupon = async()=>{
+    try{
+      setTriggered(true)
+      const res = await APIService.getCoupon(couponCode)
+      setCouponDetails(res[0])
+      setIsCouponValid(true)
+      console.log('coupon res: ', res[0])
+
+    }catch(err){
+      setCouponDetails(null)
+      setIsCouponValid(false)
+      console.log('Error with coupon code', err)
+    }
+    
   }
 
 
@@ -182,18 +205,36 @@ const handleStartDateChange = (date) => {
            <div className="my-5 block">
               <Label htmlFor="coupon" value="Coupon" />
             </div>
+            <div className="flex gap-5 items-start">
+            <div>
             <TextInput 
               id="coupon" 
               type="text"  
               placeholder='Enter coupon code' 
               value={couponCode}
+              color={triggered && (isCouponValid ? "success" : "failure")}
+              helperText={
+                triggered && ( isCouponValid ? 
+                <>
+                  <span className="font-medium">Verified</span> Coupon code applied!
+                </> :
+                <>
+                  <span className="font-medium">Oops!</span> Coupon code not found!
+                </> 
+                )
+              }
               onChange={(e) => setCouponCode(e.target.value)}
-             
               />
+            </div>
+            <Button onClick={checkCoupon}>Apply</Button> 
+            </div>
+        
+   
+              
 
             <div className="flex flex-col pb-3 mt-5">
                         <dt className="mb-1 text-gray-500 md:text-lg dark:text-gray-400">Price: </dt>
-                        <p className='text-sm text-green-500'>{couponCode === COUPON && 'Discount Applied: -₹'+ estimatedPrice*0.2}</p>
+                        <p className='text-sm text-green-500'>{couponDetails && 'Discount Applied: -₹'+ estimatedPrice*(couponDetails.discountPercent || 0)}</p>
                         <dd className="text-lg font-semibold">₹{totalCost}</dd>
             </div>
            </>)
