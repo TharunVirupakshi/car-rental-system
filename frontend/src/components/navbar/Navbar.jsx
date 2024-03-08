@@ -32,7 +32,7 @@ const NavigationBar = ({signOutHandler, user}) => {
           <span className="block text-sm">{user?.displayName}</span>
           <span className="block truncate text-sm font-medium">{user?.email}</span>
         </Dropdown.Header>
-        <Dropdown.Item>MyTrips</Dropdown.Item>
+        <Dropdown.Item><Link to={'/mytrips'}>MyTrips</Link></Dropdown.Item>
         <Dropdown.Item>MyOrders</Dropdown.Item>
         <Dropdown.Item>Settings</Dropdown.Item>
         <Dropdown.Divider />

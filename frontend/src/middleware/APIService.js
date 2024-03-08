@@ -76,6 +76,16 @@ const APIService = {
             console.error('Error fetching coupon:', error.message);
             throw error;   
         }
+    },
+    checkAvailability: async(carID)=>{
+        try {
+            const response = await api.get('/api/checkAvailability', {params: {carID}})
+            console.log('Availability :', response)
+            return response.data
+        } catch (error) {
+            console.error('Error fetching car availability:', error.message);
+            throw error;   
+        }
     }
 
 

@@ -2,7 +2,12 @@ import React from 'react'
 import { Link } from 'react-router-dom';
 import { Card } from 'flowbite-react';
 import carImage from '../../assets/maruti-suzuki-fronx-splendid-silver-with-bluish-black.jpg'
+import { useState } from 'react';
+import { useEffect } from 'react';
+import APIService from '../../middleware/APIService';
+import { RATE_PER_DAY } from '../../constants';
 const ProductCard = ({product}) => {
+
   return (
     <Card
       className="max-w-sm"
@@ -20,7 +25,18 @@ const ProductCard = ({product}) => {
         </h5>
 
 
-      <div className="mb-5 mt-2.5 flex items-center">
+      
+      <div className="flex items-center justify-between">
+        {/* <span className="text-3xl font-bold text-gray-900 dark:text-white">₹{RATE_PER_DAY}/per day</span> */}
+        {/* <a
+          href="#"
+          className="rounded-lg bg-cyan-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-cyan-800 focus:outline-none focus:ring-4 focus:ring-cyan-300 dark:bg-cyan-600 dark:hover:bg-cyan-700 dark:focus:ring-cyan-800"
+        >
+            Rent
+        </a> */}
+
+        
+        <div className="mb-5 mt-2.5 flex items-center">
         <svg
           className="h-5 w-5 text-yellow-300"
           fill="currentColor"
@@ -65,15 +81,6 @@ const ProductCard = ({product}) => {
           5.0
         </span>
       </div>
-      <div className="flex items-center justify-between">
-        <span className="text-3xl font-bold text-gray-900 dark:text-white">$599</span>
-        {/* <a
-          href="#"
-          className="rounded-lg bg-cyan-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-cyan-800 focus:outline-none focus:ring-4 focus:ring-cyan-300 dark:bg-cyan-600 dark:hover:bg-cyan-700 dark:focus:ring-cyan-800"
-        >
-            Rent
-        </a> */}
-
         <Link
         to={`/product/${product.vehicleNo}`}
         className="rounded-lg bg-cyan-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-cyan-800 focus:outline-none focus:ring-4 focus:ring-cyan-300 dark:bg-cyan-600 dark:hover:bg-cyan-700 dark:focus:ring-cyan-800"

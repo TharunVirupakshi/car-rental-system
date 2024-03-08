@@ -8,6 +8,9 @@ import { Stepper } from '../../components';
 import { RATE_PER_DAY } from '../../constants';
 import { auth } from '../../firebase/firebase';
 import { Datepicker } from 'flowbite-react';
+
+
+
 const user = auth.currentUser;
 
 

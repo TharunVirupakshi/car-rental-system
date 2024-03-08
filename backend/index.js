@@ -3,6 +3,11 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors')
 
+const CURRENT_DATE = new Date()
+//Manipulate date for testing purpose
+// const CURRENT_DATE = new Date('2024-03-09T12:00:00Z')
+
+
 const app = express();
 app.use(cors()); // Enable CORS for all routes
 
@@ -82,6 +87,44 @@ app.get('/api/getCar', (req, res)=>{
         } else {
         console.log('Cars fetched from MySQL:', result);
         res.json(result);
+        }
+    });
+})
+
+app.get('/api/checkAvailability', (req, res)=>{
+    const carID = req.query.carID
+
+    const sql = `
+    SELECT 
+        rentalEndDate
+    FROM 
+        getsRented 
+    WHERE 
+        carID = ? 
+    ORDER BY 
+        rentalEndDate DESC
+    LIMIT 1;
+    `;
+
+
+    db.query(sql, [carID], (err, result) => {
+        if (err) {
+            console.error(`Error checking availability for carID ${carID}:`, err.message);
+            res.status(500).json({ error: 'Internal Server Error' });
+        } else {
+            const latestRentalEndDate = result[0]?.rentalEndDate;
+           
+             // Convert UTC to local timezone
+             const localLatestRentalEndDate = new Date(latestRentalEndDate + 'Z');
+
+            
+
+             console.log('Fetched end date:', localLatestRentalEndDate)
+             console.log('Curent date:', CURRENT_DATE)
+
+             const isAvailable = !latestRentalEndDate || new Date(localLatestRentalEndDate).toLocaleDateString() < CURRENT_DATE.toLocaleDateString();
+ 
+             res.json({ carID, isAvailable });
         }
     });
 })
