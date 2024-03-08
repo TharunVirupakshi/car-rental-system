@@ -3,9 +3,9 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors')
 
-const CURRENT_DATE = new Date()
+// const CURRENT_DATE = new Date()
 //Manipulate date for testing purpose
-// const CURRENT_DATE = new Date('2024-03-09T12:00:00Z')
+const CURRENT_DATE = new Date('2024-03-11T12:00:00Z')
 
 
 const app = express();
@@ -288,7 +288,7 @@ app.post('/api/createTrip', async(req, res) => {
         VALUES (?, ?, ?, ?)
       `;
 
-      db.query(insertTripSQL, [orderDetails.carID, orderID, rentalStartDate, rentalEndDate], (insertErr, insertResult) => {
+      db.query(insertTripSQL, [orderDetails.carID, orderID, new Date(rentalStartDate),new Date(rentalEndDate)], (insertErr, insertResult) => {
         if (insertErr) {
           console.error('Error creating trip:', insertErr.message);
           return res.status(500).json({ error: 'Internal Server Error' });
@@ -316,16 +316,23 @@ app.post('/api/createTrip', async(req, res) => {
 //fetch trips
 app.get('/api/getAllTrips',async(req, res)=>{
     try {
-        const {custID} = req.body
+        const custID = req.query.custID
+        const formattedCurrentDate = CURRENT_DATE.toISOString().split('T')[0];
+        console.log('CurDate formatted', formattedCurrentDate)
+        console.log('Fetching trip for...', custID)
           // Fetch trips based on custID
-        const fetchTripsSQL = `
-        SELECT *
+        const fetchTripsSQL =  `
+        SELECT getsRented.*, car.*,
+               DATE_FORMAT(getsRented.rentalStartDate, '%d-%m-%Y') AS startDate,
+               DATE_FORMAT(getsRented.rentalEndDate, '%d-%m-%Y') AS endDate,
+               CASE 
+               WHEN getsRented.rentalEndDate >= '${formattedCurrentDate}' THEN 1
+               ELSE 0
+           END AS status
         FROM getsRented
-        WHERE orderID IN (
-        SELECT orderID
-        FROM rentalOrder
-        WHERE custID = ?
-        )
+        INNER JOIN rentalOrder ON getsRented.orderID = rentalOrder.orderID
+        INNER JOIN car ON getsRented.carID = car.vehicleNo
+        WHERE rentalOrder.custID = ?
     `;
 
     db.query(fetchTripsSQL, [custID], (fetchErr, result) => {
@@ -333,11 +340,11 @@ app.get('/api/getAllTrips',async(req, res)=>{
           console.error('Error fetching trips:', fetchErr.message);
           return res.status(500).json({ success: false, error: 'Internal Server Error' });
         }
-  
+        console.log('Fetched trips..', result)
+
+
         res.status(200).json({ success: true, trips: result });
       });
-
-
 
     } catch (error) {
         console.error('Error fetching trips:', error.message);

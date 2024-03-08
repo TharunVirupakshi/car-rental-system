@@ -55,10 +55,19 @@ const Order = () => {
   }, [productID])
 
  
+  // Set time part to 0 for startDate
+  startDate.setHours(0, 0, 0, 0);
 
+  // Set time part to 0 for endDate
+  endDate.setHours(0, 0, 0, 0);
   useEffect(()=>{
     console.log("Dates ",startDate, endDate)
+    const days = calculateDaysBetween(startDate, endDate)
+    console.log('Days calculated: ', days)
+    setDays(days)
   },[startDate, endDate])
+
+  
 
   useEffect(()=>{
     setEstimatedPrice(days*RATE_PER_DAY)
@@ -83,16 +92,15 @@ const Order = () => {
   }
   };
 
+
+
   const handleStartDateChange = (date) => {
     setStartDate(date);
-    const d = calculateDaysBetween(date, endDate);
-    setDays(d)
   };
 
   const handleEndDateChange = (date) => {
     setEndDate(date);
-    const d = calculateDaysBetween(startDate, date);
-    setDays(d)
+
   };
   
   const handleCreateOrder = ()=>{
@@ -111,8 +119,8 @@ const Order = () => {
         navigate('/payment', { state: { 
           orderId: data?.order?.insertId, 
           totalCost: totalCost, custID: orderDetails.custID , 
-          rentalStartDate: startDate.toISOString().slice(0, 19).replace('T', ' '), 
-          rentalEndDate: endDate.toISOString().slice(0, 19).replace('T', ' ')
+          rentalStartDate: startDate.toISOString(), 
+          rentalEndDate: endDate.toISOString()
         }})
 
       } catch (error) {
@@ -194,11 +202,11 @@ const Order = () => {
               required  
               /> */}
               <div className="my-5 block">
-              <Label htmlFor="start" value="From" />
+              <Label htmlFor="start" value="Pickup" />
               </div>
               <Datepicker name='start' minDate={new Date()} autoHide={true} onSelectedDateChanged={handleStartDateChange} />
               <div className="my-5 block">
-              <Label htmlFor="end" value="To" />
+              <Label htmlFor="end" value="Return" />
               </div>
               <Datepicker name='end' minDate={startDate || new Date()} autoHide={true} onSelectedDateChanged={handleEndDateChange}/>
 
