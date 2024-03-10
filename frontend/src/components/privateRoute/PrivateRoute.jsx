@@ -4,9 +4,9 @@ import { auth } from "../../firebase/firebase";
 
 const PrivateRoute = ({ children }) => {
   const isLoggedIn = !!auth.currentUser
-  if (!isLoggedIn) {
-    return <Navigate to="/authpage" />;
-  }
+  // if (!isLoggedIn) {
+  //   return <Navigate to="/authpage" />;
+  // }
 
   return children;
 };

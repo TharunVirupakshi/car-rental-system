@@ -10,6 +10,7 @@ const ProductPage = () => {
   const { productID } = useParams();
   const [ carData, setCarData] = useState([])
   const [isAvailable, setIsAvailable] = useState(false);
+  const [ETRDate, setETRDate] = useState(null)
   console.log('(Prodpage) id:',productID)
   useEffect(() => {
 
@@ -20,6 +21,7 @@ const ProductPage = () => {
         console.log('(ProdPage) car: ',  data);
         console.log('(Stat) : ', carStatus?.isAvailable)
         setIsAvailable(carStatus.isAvailable ?? false)
+        setETRDate(carStatus.etrDate ?? null)
         setCarData(data[0]);
       } catch (error) {
         console.error('(ProdPage) Error fetching car    :', error.message);
@@ -59,11 +61,17 @@ const ProductPage = () => {
                         <span class={"w-min inline-flex items-center bg-green-100 text-green-800 text-m font-medium px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300"}>
                           <span class="w-2 h-2 me-1 bg-green-500 rounded-full"></span>
                           Available
-                        </span> : 
+                        </span> : <>
+
                         <span class="w-min inline-flex items-center bg-red-100 text-red-800 text-m font-medium px-2.5 py-0.5 rounded-full dark:bg-red-900 dark:text-red-300">
                           <span class="w-2 h-2 me-1 bg-red-500 rounded-full"></span>
                           Unavailable
                         </span>
+                        <div class="flex flex-col py-3">
+                        <dt class="mb-1 text-gray-500 md:text-lg dark:text-gray-400">Available after</dt>
+                        <dd class="text-lg font-semibold">{new Date(ETRDate).toISOString().split('T')[0] ?? ' '}</dd>
+                       </div>
+                        </>
 
                         }
                        

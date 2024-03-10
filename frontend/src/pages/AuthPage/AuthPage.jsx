@@ -2,7 +2,8 @@ import {useState} from 'react'
 import {signIn, signUp} from '../../middleware/AuthService'
 import { useNavigate } from 'react-router-dom';
 import { Button, Checkbox, Label, TextInput } from 'flowbite-react';
-
+import { Alert } from 'flowbite-react';
+import { HiInformationCircle } from 'react-icons/hi';
 
 
 const AuthPage = () => {
@@ -14,7 +15,7 @@ const AuthPage = () => {
   const [name, setName] = useState('')
   const [address, setAddress] = useState('')
   const [contact, setContact] = useState('')
-  
+  const [errorMessage,setErrorMessage] = useState(null)
 
   const [isSignUp, setIsSignUp] = useState(false);
   
@@ -35,22 +36,29 @@ const AuthPage = () => {
     e.preventDefault();
     try {
       const contactNum = contact
-      await signUp(email, password, name, contactNum, address);
+      await signUp({email, password, name, contactNum, address});
       // Redirect or perform other actions after successful sign-up
       navigate('/');
     } catch (error) {
       // Handle sign-up errors (display error message, etc.)
       console.error('Sign-up error:', error.message);
+      setErrorMessage(error.message)
     }
   };
 
 
 
 
-  return (
+  return (<>
+
+    {errorMessage && (
+            <Alert color="failure" icon={HiInformationCircle} className="fixed">
+              <span className="font-medium">Error!</span> {errorMessage}
+            </Alert>
+          )}
     <div className='flex w-screen h-screen justify-center'>
 
-      
+     
 
        <form className="flex flex-col gap-4 w-96 my-16">
        <h1 className="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white">Welcome!</h1>
@@ -84,9 +92,10 @@ const AuthPage = () => {
             <TextInput
               id="contactNum"
               type="text"
-              placeholder='Enter your contact numyer'
+              placeholder='Enter your contact number'
               value={contact}
-              onChange={(e) => setContact(e.target.value)}
+              onChange={(e) =>{setContact(e.target.value); console.log( 'Ph: ',e.target.value)}}
+              maxLength={15}
               required
             />
             <div className="my-2 block">
@@ -157,6 +166,8 @@ const AuthPage = () => {
       {/* <Button type="" onClick={handleSignUp}>Sign Up</Button> */}
     </form>
     </div>
+
+    </>
   )
 }
 

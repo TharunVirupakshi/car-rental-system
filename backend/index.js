@@ -3,9 +3,9 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors')
 
-// const CURRENT_DATE = new Date()
+const CURRENT_DATE = new Date()
 //Manipulate date for testing purpose
-const CURRENT_DATE = new Date('2024-03-11T12:00:00Z')
+// const CURRENT_DATE = new Date('2024-03-11T12:00:00Z')
 
 
 const app = express();
@@ -45,7 +45,7 @@ app.post('/api/store-user', (req, res) => {
   // Perform SQL database insertion
   db.query(sql, values, (err, result) => {
       if (err) {
-          console.error('Error inserting user details into MySQL:', err.message);
+          console.error(`Error inserting user ${contactNum} details into MySQL:`, err.message);
           res.status(500).json({ error: 'Internal Server Error' });
       } else {
           console.log('User details inserted into MySQL:', result);
@@ -124,7 +124,7 @@ app.get('/api/checkAvailability', (req, res)=>{
 
              const isAvailable = !latestRentalEndDate || new Date(localLatestRentalEndDate).toLocaleDateString() < CURRENT_DATE.toLocaleDateString();
  
-             res.json({ carID, isAvailable });
+             res.json({ carID,etrDate : localLatestRentalEndDate, isAvailable });
         }
     });
 })

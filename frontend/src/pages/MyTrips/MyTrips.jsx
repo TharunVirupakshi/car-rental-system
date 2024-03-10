@@ -1,30 +1,41 @@
+import { onAuthStateChanged } from 'firebase/auth'
 import React from 'react'
-import { useEffect } from 'react'
-import { useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
+
 import { auth } from '../../firebase/firebase'
 import APIService from '../../middleware/APIService'
+
 
 
 const MyTrips = () => {
 
   const [data, setData] = useState([])
-  const user = auth.currentUser
+  const [user, setUser] = useState(null)
 
-  useEffect(()=>{
-    const fetch = async()=>{
-        try{
-            console.log('MyTrips uid: ', user?.uid)
-            const res = await APIService.getAllTrips(user?.uid)
-            if(res.length != 0){
-                setData(res)
-            }
-        }catch(err){
-            
-        }
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const fetchTrips = useMemo(() => async () => {
+    try {
+      console.log('MyTrips uid: ', user?.uid);
+      const res = await APIService.getAllTrips(user?.uid);
+      if (res.length !== 0) {
+        setData(res);
+      }
+    } catch (err) {
+      console.log('Error fetching trips', err);
     }
+  }, [user]);
 
-    fetch()
-  },[])
+  useEffect(() => {
+    fetchTrips();
+  }, [fetchTrips]);
 
   
 

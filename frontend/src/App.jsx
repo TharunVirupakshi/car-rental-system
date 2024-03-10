@@ -22,18 +22,18 @@ function App() {
 
   useEffect(()=>{
 
-    // const unsubscribe = onAuthStateChanged(auth, (user) => {
-    //   setUser(user);
-    //   setIsLoggedIn(!!user); 
-    // });
-    const user = auth.currentUser;
-    setUser(user)
-    setIsLoggedIn(!!user);
-    // return () => unsubscribe();
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
+      setIsLoggedIn(!!user);
+    });
+
+    return () => unsubscribe();
      
-  })
+  },[])
 
-
+  useEffect(()=>{
+    console.log('User: ', auth.currentUser)
+  },[user])
    
 
 
