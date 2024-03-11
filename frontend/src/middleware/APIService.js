@@ -98,6 +98,40 @@ const APIService = {
             throw error;   
         }
 
+    },
+    getUser: async(custID)=>{
+      try {
+        const response = await api.get('/api/getUser', {params: {custID}})
+        console.log('User details:', response.data)
+        return response.data
+        
+      } catch (error) {
+        console.error('Error fetching user:', error.message);
+        throw error;    
+      }
+    },
+    updateUser: async({custID, name, address, contactNum}) => {
+      try {
+        const response = await api.post('/api/updateUser', {custID, name, address, contactNum})
+        console.log('User details:', response.data)
+        return response.data
+        
+      } catch (error) {
+        console.error('Error updating user:', error.message);
+        throw error;    
+      }
+    },
+    getDemand: async(date)=>{
+      try {
+        const response = await axios.get('http://172.17.13.160:5000/predict', {params:{new_date: date}})
+
+        console.log('Data from ML SERVER: ', response.data)
+
+        return response.data
+        
+      } catch (error) {
+        console.error('Error fetching demand:', error.message); 
+      }
     }
 
 

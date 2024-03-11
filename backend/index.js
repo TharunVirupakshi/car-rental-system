@@ -5,13 +5,15 @@ const cors = require('cors')
 
 const CURRENT_DATE = new Date()
 //Manipulate date for testing purpose
-// const CURRENT_DATE = new Date('2024-03-11T12:00:00Z')
+// const CURRENT_DATE = new Date('2024-03-12T12:00:00Z')
 
 
 const app = express();
 app.use(cors()); // Enable CORS for all routes
 
 const mysql = require('mysql');
+
+
 const { json, application } = require('express');
 
 
@@ -53,6 +55,62 @@ app.post('/api/store-user', (req, res) => {
       }
   });
 });
+
+app.get('/api/getUser', (req, res)=>{
+    const custID = req.query.custID
+
+    const sql = 'SELECT * FROM customer WHERE customer.custID = ?'
+
+    db.query(sql, [custID], (err, result)=>{
+        if (err) {
+            console.error(`Error getting user ${contactNum}:`, err.message);
+            res.status(500).json({ error: 'Internal Server Error' });
+        } else {
+            console.log('User details:', result);
+            res.json(result);
+        } 
+    })
+})
+
+app.post('/api/updateUser', (req, res)=>{
+    const {custID, name, contactNum, address} = req.body
+
+     // Assuming you have a 'users' table in your database
+     const sql = `
+     UPDATE customer
+     SET name = ?, contactNum = ?, address = ?
+     WHERE custID = ?
+    `;
+
+    const fetchUser = 'SELECT * FROM customer WHERE customer.custID = ?'
+
+    db.query(fetchUser, [custID], (err, result)=>{
+        if (err) {
+            console.error(`Error getting user ${custID}:`, err.message);
+            res.status(500).json({ error: 'Internal Server Error' });
+        } else {
+            console.log('User details:', result);
+            const user = result[0]
+            const values = [name ?? user.name, contactNum ?? user.contactNum, address ?? user.address, custID]
+
+            db.query(sql, values, (err, result) => {
+                if (err) {
+                    console.error(`Error updateing user ${custID}:`, err.message);
+                    res.status(500).json({ error: 'Internal Server Error' });
+                } else { 
+                    console.log('Updated!')  
+                    res.status(201).json({ success: true, result});    
+                }
+            })
+            
+        } 
+    })
+
+   
+
+
+
+})
 
 // API endpoint to fetch cars from the 'car' table
 app.get('/api/getCars', (req, res) => {

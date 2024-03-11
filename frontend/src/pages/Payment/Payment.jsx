@@ -7,6 +7,7 @@ import { useState } from 'react';
 import APIService from '../../middleware/APIService';
 import { useEffect } from 'react';
 
+
 const Payment = () => {
   const location = useLocation();
   // Access the parameters from location.state

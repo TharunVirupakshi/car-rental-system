@@ -38,6 +38,8 @@ const Order = () => {
   const [triggered, setTriggered] = useState(false)
   const navigate = useNavigate()
 
+  const[demand, setDemand] = useState(0)
+
   //Fetch the car details
   useEffect(() => {
 
@@ -68,10 +70,28 @@ const Order = () => {
   },[startDate, endDate])
 
   
+  useEffect(()=>{
+    const fetchData = async () => {
+      try {
+        const data = await APIService.getDemand(startDate);
+        console.log('Demand ',  data.result[0]);
+        setDemand(data.result[0]);
+      } catch (error) {
+        console.error('Error fetching demand:', error.message);
+      }
+    };
+
+    fetchData();
+  },[days])
 
   useEffect(()=>{
-    setEstimatedPrice(days*RATE_PER_DAY)
+    const rate = demand!=0 ? RATE_PER_DAY+RATE_PER_DAY*(demand/100) : RATE_PER_DAY
+    const price = (days * rate).toFixed(2);
+
+    setEstimatedPrice(price)
   },[days])
+
+
 
   //Apply Discount
   useEffect(()=>{
