@@ -33,18 +33,28 @@ const ProfilePage = () => {
 const handleSaveData = async() => {
     try {
         const data = await APIService.updateUser({custID: auth.currentUser?.uid, name: name, address: address, contactNum: contactNum})
-        
+        if(data.success){
+          alert('Saved !')
+          setIsEdit(false)
+        }
 
     } catch (err) {
         console.log("Error", err)
     }
 }
 
+useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   useEffect(()=>{
     const fetchData = async () => {
         try {
-          const data = await APIService.getUser(auth.currentUser?.uid);
+          const data = await APIService.getUser(user?.uid);
           setUserDetails(data[0])
           console.log('(ProfilePage) user: ',  data[0]);
 
@@ -54,7 +64,7 @@ const handleSaveData = async() => {
       };
   
       fetchData();
-  },[])
+  },[user, isEdit])
 
   return (
     <div className='p-5'>

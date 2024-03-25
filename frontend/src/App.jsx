@@ -69,8 +69,8 @@ function App() {
             </PrivateRoute>
             } 
           />
-          <Route path="/myprofile" element={ <ProfilePage/> }/>
-          <Route path="/authpage" element={<AuthPage />} />
+        <Route path="/myprofile" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
+        <Route path="/authpage" element={<AuthPage />} />
      </Routes>
 
 

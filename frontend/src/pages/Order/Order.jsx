@@ -82,14 +82,14 @@ const Order = () => {
     };
 
     fetchData();
-  },[days])
+  },[startDate])
 
   useEffect(()=>{
     const rate = demand!=0 ? RATE_PER_DAY+RATE_PER_DAY*(demand/100) : RATE_PER_DAY
     const price = (days * rate).toFixed(2);
 
     setEstimatedPrice(price)
-  },[days])
+  },[days, demand])
 
 
 
@@ -235,6 +235,7 @@ const Order = () => {
             <div className="flex flex-col pb-3 mt-5">
                         <dt className="mb-1 text-gray-500 md:text-lg dark:text-gray-400">Estimated Price: </dt>
                         <dd className="text-lg font-semibold">₹{estimatedPrice ?? '0.0'}</dd>
+                        
             </div>
            </>)} {isPaymentModeOn && (
            <>
