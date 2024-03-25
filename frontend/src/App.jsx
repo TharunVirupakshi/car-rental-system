@@ -74,10 +74,11 @@ function App() {
         <Route path="/adminauthpage" element={<AdminAuthPage/>}/>
 
         <Route path="/adminDashboard" element={<AdminDashboard/>}>
-        <Route path="managecars" element={<ManageCars/>}/>
-        <Route path="managediscounts" element={<ManageDiscounts/>}/>
-        <Route path="managelocations" element={<ManageLocations/>}/>
-        <Route path="managestaff" element={<ManageStaff/>}/>
+          <Route index element={<Navigate to="/adminDashboard/managecars" replace/>} />
+          <Route path="managecars" element={<ManageCars />} />
+          <Route path="managediscounts" element={<ManageDiscounts />} />
+          <Route path="managelocations" element={<ManageLocations />} />
+          <Route path="managestaff" element={<ManageStaff />} />
         </Route>
      </Routes>
 

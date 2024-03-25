@@ -42,7 +42,6 @@ const AdminDashboard = () => {
         }
     useEffect(()=>{
       check()
-        
     },[isLoggedIn])
 
     const [selected,setSelected] = useState(1)

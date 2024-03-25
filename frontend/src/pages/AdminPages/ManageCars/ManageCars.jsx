@@ -4,7 +4,7 @@ import { Button, Checkbox, Label, Modal, TextInput } from "flowbite-react";
 import { async } from '@firebase/util';
 
 
-const AddCarModal = () =>{
+const AddCarModal = ({closeModal, refresh}) =>{
   const [data, setData] = useState({
     vehicleNo: '',
     model: '',
@@ -29,7 +29,12 @@ const AddCarModal = () =>{
 
   const handleSubmit = async() => {
       try {
-        await APIService.addCar(data)
+        const res = await APIService.addCar(data)
+        if(res?.success ?? false){
+          alert('Car Added!')
+        }
+        refresh()
+        closeModal()
       } catch (error) {
         console.log(error)
       }
@@ -85,7 +90,7 @@ const AddCarModal = () =>{
   )
 }
 
-const EditModal = ({id}) =>{
+const EditModal = ({id, closeModal, refresh}) =>{
   const [data, setData] = useState({
     vehicleNo: '',
     model: '',
@@ -125,18 +130,26 @@ const EditModal = ({id}) =>{
       try {
         await APIService.updateCar(data)
         alert('Saved!')
+        refresh()
+        closeModal()
       } catch (error) {
         console.log(error)
       }
   }
 
   const handleDelete = async() => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this car?");
+  if (confirmDelete) {
     try {
-      await APIService.deleteCar(vehicleNo)
-      alert('Deleted!')
+      await APIService.deleteCar(curCar?.vehicleNo);
+      alert('Car deleted successfully!');
+      refresh()
+      closeModal()
     } catch (error) {
-      console.log(error) 
+      console.error(error);
+      alert('Failed to delete car. Please try again later.');
     }
+  }
   }
 
 
@@ -174,9 +187,14 @@ const EditModal = ({id}) =>{
                 Lost Password?
               </a>
             </div> */}
-            <div className="w-full">
+            <div className="w-full flex gap-4">
               <Button onClick={handleSubmit}>Update car</Button>
+              <button onClick={handleDelete} data-modal-hide="popup-modal" type="button" class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center">
+                    Delete
+              </button>
             </div>
+
+           
             {/* <div className="flex justify-between text-sm font-medium text-gray-500 dark:text-gray-300">
               Not registered?&nbsp;
               <a href="#" className="text-cyan-700 hover:underline dark:text-cyan-500">
@@ -212,6 +230,10 @@ const ManageCars = () => {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  const refetchData = () => {
+    fetchData()
+  }
 
   function onCloseModal() {
     setOpenModal(false);
@@ -289,13 +311,13 @@ const ManageCars = () => {
     <Modal show={openModal} size="md" onClose={onCloseModal} popup>
         <Modal.Header />
         <Modal.Body>
-          <AddCarModal />
+          <AddCarModal closeModal={onCloseModal} refresh={refetchData}/>
         </Modal.Body>
       </Modal>
     <Modal show={openEditModal} size="lg" onClose={onCloseEditModal}  popup>
         <Modal.Header />
         <Modal.Body>
-          <EditModal id={editVehicleNo}/>
+          <EditModal id={editVehicleNo} closeModal={onCloseEditModal} refresh={refetchData}/>
         </Modal.Body>
       </Modal>
 

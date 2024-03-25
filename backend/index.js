@@ -18,6 +18,7 @@ const mysql = require('mysql');
 const { json, application } = require('express');
 
 
+
 var db = mysql.createConnection({
     host: "localhost",
     user: "root",
@@ -84,7 +85,7 @@ app.post('/api/addCar', async(req, res)=>{
             res.status(500).json({ error: err.message });
         } else {
             console.log('added car!', result);
-            res.json({ message: 'Added car!' });
+            res.json({success: true, message: 'Added car!' });
         }
     }); 
 })
@@ -469,6 +470,8 @@ app.post('/api/createCoupon', (req, res) => {
         }
     });
 })
+
+
 
 app.delete('/api/deleteCoupon', (req, res) => {
     const discountID = req.query.discountID

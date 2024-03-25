@@ -148,7 +148,40 @@ const APIService = {
       } catch (error) {
         console.log('Error deleting car: ', error.message)
       }
+    },
+    getCoupons: async() => {
+      try {
+        const res = await api.get('/api/getCoupons')
+        console.log('Coupons: ',res.data)
+        return res.data
+      } catch (error) {
+        console.log('Error fetching coupons: ', error.message)
+      }
+    },
+    deleteCoupon: async({discountID}) =>{
+      try {
+        const res = await api.delete('/api/deleteCoupon', {params: {discountID}})
+        return res.data
+      } catch (error) {
+        console.log('Error deleting coupon: ', error.message) 
+      }
+    },
+    addCoupon: async({couponCode, discountPercent}) => {
+      try {
+        const res = await api.post('/api/createCoupon', {couponCode, discountPercent})
+        return res.data
+      } catch (error) {
+        console.log('Error creating coupon: ', error.message)  
+      }
     }
+    // updateCoupon: async({discountID, couponCode, discountPercent}) => {
+    //   try {
+    //     const res = await api.put('/api/updateCoupon', {discountID, couponCode, discountPercent})
+    //     return res.data
+    //   } catch (error) {
+    //     console.log('Error updating coupon!')
+    //   }
+    // }
     ,
     getDemand: async(date)=>{
       try {
@@ -162,6 +195,7 @@ const APIService = {
         console.error('Error fetching demand:', error.message); 
       }
     },
+    
   
 
 
