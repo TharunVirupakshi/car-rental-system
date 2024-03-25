@@ -58,7 +58,7 @@ app.post('/api/store-user', (req, res) => {
 });
 
 
-
+//Cars endpoints
 app.post('/api/addCar', async(req, res)=>{
     const {vehicleNo, carType, model, locationID } = req.body
     
@@ -128,7 +128,7 @@ app.put('/api/updateCar', async(req, res) =>{
     sql = sql.slice(0, -2);
 
     // Add the WHERE clause
-    sql += ' WHERE vehicleNo=?';
+    sql += ' WHERE vehicleNo=? AND car.deleted_at IS NULL;';
     values.push(vehicleNo);
 
 
@@ -150,7 +150,7 @@ app.delete('/api/deleteCar', (req, res) => {
     const softDeleteCarSQL = `
         UPDATE car
         SET deleted_at = NOW()
-        WHERE vehicleNo = ?;
+        WHERE vehicleNo = ? AND car.deleted_at IS NULL;
     `;
 
     db.query(softDeleteCarSQL, [vehicleNo], (err, result) => {
@@ -169,10 +169,10 @@ app.delete('/api/deleteCar', (req, res) => {
     });
 });
 
-// API endpoint to fetch cars from the 'car' table
+
 app.get('/api/getCars', (req, res) => {
     // SQL query to select all cars from the 'car' table
-    const sql = 'SELECT * FROM car, location WHERE car.locationID = location.locationID';
+    const sql = 'SELECT * FROM car, location WHERE car.locationID = location.locationID AND car.deleted_at IS NULL';
   
     // Perform SQL database query
     db.query(sql, (err, result) => {
@@ -186,31 +186,33 @@ app.get('/api/getCars', (req, res) => {
     });
   });
   
-  
-  app.get('/api/getCar', (req, res)=>{
-      
-      const vehicleNo = req.query.vehicleNo;
-  
-      const sql = `SELECT * FROM car, location WHERE car.vehicleNo = ? AND car.locationID = location.locationID AND car.deleted_at IS NULL`
-  
-  
-      // Perform SQL database query
-      db.query(sql,[vehicleNo] ,(err, result) => {
-          if (err) {
-          console.error(`Error fetching car with ID ${vehicleNo}  from MySQL:`, err.message);
-          res.status(500).json({ error: 'Internal Server Error' });
-          } else {
-            if (result.length == 0) {
-                console.log('No car found with the specified vehicle number:', vehicleNo);
-                res.status(404).json({ error: 'No car found with the specified vehicle number' });
-            } else {
-                console.log('Cars fetched from MySQL:', result);
-                res.json(result);
-            }
-          
-          }
-      });
-  })
+app.get('/api/getCar', (req, res)=>{
+    
+    const vehicleNo = req.query.vehicleNo;
+
+    const sql = `SELECT * FROM car, location WHERE car.vehicleNo = ? AND car.locationID = location.locationID AND car.deleted_at IS NULL`
+
+
+    // Perform SQL database query
+    db.query(sql,[vehicleNo] ,(err, result) => {
+        if (err) {
+        console.error(`Error fetching car with ID ${vehicleNo}  from MySQL:`, err.message);
+        res.status(500).json({ error: 'Internal Server Error' });
+        } else {
+        if (result.length == 0) {
+            console.log('No car found with the specified vehicle number:', vehicleNo);
+            res.status(404).json({ error: 'No car found with the specified vehicle number' });
+        } else {
+            console.log('Cars fetched from MySQL:', result);
+            res.json(result);
+        }
+        
+        }
+    });
+})
+
+
+
 
 app.get('/api/getUser', (req, res)=>{
     const custID = req.query.custID
@@ -390,10 +392,12 @@ app.post('/api/createOrder', async(req, res)=>{
 
 })
 
+
+// Coupons endpoints
 app.get('/api/getCoupon', (req, res)=>{
     const couponCode = req.query.couponCode
 
-    const sql = 'SELECT * FROM discount WHERE couponCode = ?'
+    const sql = 'SELECT * FROM discount WHERE couponCode = ? AND discount.deleted_at IS NULL'
 
     db.query(sql, [couponCode], (err, result)=>{
         if (err) {
@@ -412,6 +416,87 @@ app.get('/api/getCoupon', (req, res)=>{
         }
     })
 })
+app.get('/api/getCoupons', (req, res)=>{
+
+    const sql = 'SELECT * FROM discount WHERE discount.deleted_at IS NULL'
+
+    db.query(sql, (err, result)=>{
+        if (err) {
+            console.error(`Error fetching coupon with code ${couponCode} from MySQL:`, err.message);
+            res.status(500).json({ error: 'Internal Server Error' });
+        } else {
+            if (result.length === 0) {
+                // Coupon does not exist
+                console.log('Coupons not found.');
+                res.status(404).json({ error: 'Coupons not found' });
+            } else {
+                // Coupon exists
+                console.log('Coupons fetched from MySQL:', result);
+                res.json(result);
+            }
+        }
+    })
+})
+
+app.post('/api/createCoupon', (req, res) => {
+    const {couponCode, discountPercent} = req.body
+
+    const checkCouponCode = 'SELECT COUNT(*) AS count FROM discount WHERE discount.couponCode = ? AND discount.deleted_at IS NULL' 
+
+
+    db.query(checkCouponCode, [couponCode], (err, result) => {
+        if (err) {
+            console.error(`Error checking coupon code`, err.message);
+            res.status(500).json({ error: 'Error checking coupon code' });
+        } else {
+            const count = result[0].count;
+            if (count > 0) {
+                // Coupon code already exists
+                res.status(400).json({ error: 'Coupon code already exists' });
+            } else {
+                // Coupon code does not exist, proceed with creation
+                const createCouponSQL = 'INSERT INTO discount (couponCode, discountPercent) VALUES (?, ?)';
+                db.query(createCouponSQL, [couponCode, discountPercent], (err, result) => {
+                    if (err) {
+                        console.error(`Error creating coupon`, err.message);
+                        res.status(500).json({ error: 'Error creating coupon' });
+                    } else {
+                        console.log('Coupon created!');
+                        res.json({ success: true, message: 'Coupon created!' });
+                    }
+                });
+            }
+        }
+    });
+})
+
+app.delete('/api/deleteCoupon', (req, res) => {
+    const discountID = req.query.discountID
+
+    const softDelete = `
+        UPDATE discount
+        SET deleted_at = NOW()
+        WHERE discountID = ? AND discount.deleted_at IS NULL;
+    `; 
+
+
+    db.query(softDelete, [discountID], (err, result) => {
+        if (err) {
+            console.error('Error deleting discount:', err.message);
+            res.status(500).json({ error: 'Error deleting discount' });
+        } else {
+            if (result.affectedRows === 0) {
+                console.log('No discount found with id ', discountID);
+                res.status(404).json({ error: 'No discount found with that id' });
+            } else {
+                console.log('Discount deleted successfully:', discountID);
+                res.json({ message: 'Discount deleted successfully' });
+            }
+        }
+    });
+
+})
+
 
 
 app.post('/api/createPayment', async(req, res)=>{
@@ -566,8 +651,6 @@ app.get('/api/getAllTrips',async(req, res)=>{
 })
 
 
-
-  
 
 // Start the server
 const PORT = process.env.PORT || 3000;
