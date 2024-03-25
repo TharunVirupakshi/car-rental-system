@@ -121,6 +121,35 @@ const APIService = {
         throw error;    
       }
     },
+    addCar: async({vehicleNo, model, carType, locationID}) => {
+      try {
+        const response = await api.post('/api/addCar', {vehicleNo, model, carType, locationID})
+        console.log('Added car!')
+
+        return response.data
+        
+      } catch (error) {
+        console.error('Error adding car:', error.message);  
+      }
+    },
+    updateCar: async({vehicleNo, model, carType, locationID}) => {
+      try {
+        await api.put('/api/updateCar', {vehicleNo, model, carType, locationID})
+        console.log('Updated!')
+      } catch (error) {
+        console.error('Error updating car:', error.message);   
+
+      }
+    }
+    ,
+    deleteCar: async(vehicleNo) => {
+      try {
+        await api.delete('/api/deleteCar', {params: {vehicleNo}})
+      } catch (error) {
+        console.log('Error deleting car: ', error.message)
+      }
+    }
+    ,
     getDemand: async(date)=>{
       try {
         const response = await axios.get('http://172.17.13.160:5000/predict', {params:{new_date: date}})
@@ -132,7 +161,8 @@ const APIService = {
       } catch (error) {
         console.error('Error fetching demand:', error.message); 
       }
-    }
+    },
+  
 
 
     

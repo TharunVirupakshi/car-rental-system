@@ -2,12 +2,13 @@ import { useState, useEffect } from 'react'
 import './App.css'
 
 import {Navigate, Route, Routes, useNavigate} from 'react-router-dom';
-import { CarListing, Homepage, Order, Payment, AuthPage, ProductPage, MyTrips, ProfilePage } from './pages';
+import { CarListing, Homepage, Order, Payment, AuthPage, ProductPage, MyTrips, ProfilePage, AdminAuthPage, AdminDashboard, ManageCars, ManageDiscounts, ManageLocations, ManageStaff } from './pages';
 import {auth} from './firebase/firebase'
 import { onAuthStateChanged } from "firebase/auth";
 import {Navbar} from './components'
 import {signOut} from './middleware/AuthService'
 import PrivateRoute from './components/privateRoute/PrivateRoute';
+
 
 
 
@@ -40,7 +41,6 @@ function App() {
 
   return (
     <>
-     
   
      {isLoggedIn ? <Navbar signOutHandler={signOut} user={user}/> : 
      <div className='flex w-screen'>
@@ -71,6 +71,14 @@ function App() {
           />
         <Route path="/myprofile" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
         <Route path="/authpage" element={<AuthPage />} />
+        <Route path="/adminauthpage" element={<AdminAuthPage/>}/>
+
+        <Route path="/adminDashboard" element={<AdminDashboard/>}>
+        <Route path="managecars" element={<ManageCars/>}/>
+        <Route path="managediscounts" element={<ManageDiscounts/>}/>
+        <Route path="managelocations" element={<ManageLocations/>}/>
+        <Route path="managestaff" element={<ManageStaff/>}/>
+        </Route>
      </Routes>
 
 

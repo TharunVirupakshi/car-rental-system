@@ -21,15 +21,6 @@ const ProfilePage = () => {
   const [contactNum, setContactNum] = useState(null)
 
 
-//   useEffect(() => {
-//     const unsubscribe = onAuthStateChanged(auth, (user) => {
-//       setUser(user);
-//     });
-
-
-//     return () => unsubscribe();
-//   },[auth]);
-
 const handleSaveData = async() => {
     try {
         const data = await APIService.updateUser({custID: auth.currentUser?.uid, name: name, address: address, contactNum: contactNum})

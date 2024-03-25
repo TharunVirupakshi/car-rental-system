@@ -8,6 +8,13 @@ import {
     browserSessionPersistence, 
     onAuthStateChanged } from "firebase/auth";
 import { LOCAL_SERVER } from "../constants";
+import APIService from "./APIService";
+
+
+
+
+
+
 // Example function to send a POST request to store user details
 const storeUserDetails = async (userDetails) => {
   try {
@@ -86,7 +93,19 @@ const getCurrentUser = () => {
   return auth.currentUser;
 };
 
+const adminLogin =  async({email, password})=>{
+  try {
+    const response = await axios.post(LOCAL_SERVER+'/api/loginAdmin', {email, password})
+    console.log('Admin authentiated')
+
+    return response.data
+  } catch (error) {
+
+    console.error('Error authenticating admin:', error.message);
+    throw error;   
+  }
+}
 
 
 
-export { signUp, signIn, signOut, getCurrentUser};
+export { signUp, signIn, signOut, getCurrentUser, adminLogin};

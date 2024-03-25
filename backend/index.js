@@ -2,10 +2,11 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors')
+const bcrypt = require('bcrypt')
 
-const CURRENT_DATE = new Date()
+// const CURRENT_DATE = new Date()
 //Manipulate date for testing purpose
-// const CURRENT_DATE = new Date('2024-03-12T12:00:00Z')
+const CURRENT_DATE = new Date('2024-03-27T12:00:00Z')
 
 
 const app = express();
@@ -39,7 +40,7 @@ app.get('/', (req, res)=>{
 // API endpoint to receive user details and store in SQL
 app.post('/api/store-user', (req, res) => {
   const {custID, name, contactNum, email, address } = req.body;
-
+   
   // SQL query to insert user details into the 'customer' table
   const sql = 'INSERT INTO customer (custID, name, contactNum, email, address) VALUES (?, ?, ?, ?, ?)';
   const values = [custID ,name, contactNum, email, address];
@@ -56,6 +57,161 @@ app.post('/api/store-user', (req, res) => {
   });
 });
 
+
+
+app.post('/api/addCar', async(req, res)=>{
+    const {vehicleNo, carType, model, locationID } = req.body
+    
+    console.log('add car', req.body)
+     // Check if any of the values are empty strings
+     if (!vehicleNo || !carType || !model || !locationID) {
+        return res.status(400).json({ error: 'Missing required fields' });
+    }
+    
+    if(vehicleNo === '' || carType === '' || model === ''){
+       return res.status(400).json({ error: 'Missing required fields' }); 
+    }
+
+    const sql = 'INSERT INTO car (vehicleNo, carType, model, locationID) VALUES(?,?,?,?)'
+
+  
+    
+
+    // Perform SQL database insertion
+    db.query(sql,[vehicleNo, carType, model, locationID] , (err, result) => {
+        if (err) {
+            console.error(`Error adding car`, err.message);
+            res.status(500).json({ error: err.message });
+        } else {
+            console.log('added car!', result);
+            res.json({ message: 'Added car!' });
+        }
+    }); 
+})
+
+app.put('/api/updateCar', async(req, res) =>{
+    const {vehicleNo, carType, model, locationID } = req.body
+
+     // Check if any fields are sent in the request body
+     if (!carType && !model && !locationID) {
+        return res.status(400).json({ error: 'No fields to update' });
+    }
+
+      // Validate that none of the fields are empty
+      if ((carType && carType.trim() === '') ||
+          (model && model.trim() === '') ||
+          (locationID && locationID.trim() === '')) {
+              return res.status(400).json({
+                  error: 'Fields cannot be empty'
+              });
+      }
+
+    // Construct the SQL query dynamically based on the fields sent
+    let sql = 'UPDATE car SET ';
+    const values = [];
+
+
+    if (carType) {
+        sql += 'carType=?, ';
+        values.push(carType);
+    }
+    if (model) {
+        sql += 'model=?, ';
+        values.push(model);
+    }
+    if (locationID) {
+        sql += 'locationID=?, ';
+        values.push(locationID);
+    }
+
+    // Remove the trailing comma and space
+    sql = sql.slice(0, -2);
+
+    // Add the WHERE clause
+    sql += ' WHERE vehicleNo=?';
+    values.push(vehicleNo);
+
+
+    // Perform the database update
+    db.query(sql, values, (err, result) => {
+        if (err) {
+            console.error('Error updating car:', err.message);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+        console.log('Updated car:', result);
+        res.json({ message: 'Car updated successfully' });
+    });
+
+})
+
+app.delete('/api/deleteCar', (req, res) => {
+    const { vehicleNo } = req.query;
+    console.log('Deleting car ', vehicleNo)
+    const softDeleteCarSQL = `
+        UPDATE car
+        SET deleted_at = NOW()
+        WHERE vehicleNo = ?;
+    `;
+
+    db.query(softDeleteCarSQL, [vehicleNo], (err, result) => {
+        if (err) {
+            console.error('Error deleting car:', err.message);
+            res.status(500).json({ error: 'Internal Server Error' });
+        } else {
+            if (result.affectedRows === 0) {
+                console.log('No car found with the specified vehicle number:', vehicleNo);
+                res.status(404).json({ error: 'No car found with the specified vehicle number' });
+            } else {
+                console.log('Car deleted successfully:', vehicleNo);
+                res.json({ message: 'Car deleted successfully' });
+            }
+        }
+    });
+});
+
+// API endpoint to fetch cars from the 'car' table
+app.get('/api/getCars', (req, res) => {
+    // SQL query to select all cars from the 'car' table
+    const sql = 'SELECT * FROM car, location WHERE car.locationID = location.locationID';
+  
+    // Perform SQL database query
+    db.query(sql, (err, result) => {
+      if (err) {
+        console.error('Error fetching cars from MySQL:', err.message);
+        res.status(500).json({ error: 'Internal Server Error' });
+      } else {
+        console.log('Cars fetched from MySQL:', result);
+        res.json(result);
+      }
+    });
+  });
+  
+  
+  app.get('/api/getCar', (req, res)=>{
+      
+      const vehicleNo = req.query.vehicleNo;
+  
+      const sql = `SELECT * FROM car, location WHERE car.vehicleNo = ? AND car.locationID = location.locationID AND car.deleted_at IS NULL`
+  
+  
+      // Perform SQL database query
+      db.query(sql,[vehicleNo] ,(err, result) => {
+          if (err) {
+          console.error(`Error fetching car with ID ${vehicleNo}  from MySQL:`, err.message);
+          res.status(500).json({ error: 'Internal Server Error' });
+          } else {
+            if (result.length == 0) {
+                console.log('No car found with the specified vehicle number:', vehicleNo);
+                res.status(404).json({ error: 'No car found with the specified vehicle number' });
+            } else {
+                console.log('Cars fetched from MySQL:', result);
+                res.json(result);
+            }
+          
+          }
+      });
+  })
+
 app.get('/api/getUser', (req, res)=>{
     const custID = req.query.custID
 
@@ -69,6 +225,40 @@ app.get('/api/getUser', (req, res)=>{
             console.log('User details:', result);
             res.json(result);
         } 
+    })
+})
+
+app.post('/api/loginAdmin', (req, res) => {
+    const {email, password} = req.body
+    const sql = "SELECT * FROM admin WHERE email = ?"
+
+    db.query(sql, [email], async(err, result)=>{
+        if (err) {
+            console.error(`Error getting logging in admin ${email}:`, err.message);
+            res.status(500).json({ error: 'Internal Server Error'});
+            return
+        }
+
+        if (result.length === 0) {
+            res.status(401).json({ error: 'Invalid credentials' });
+            return;
+        }
+
+        const user = result[0];
+
+        try{
+            const match = await bcrypt.compare(password, user.password);
+            if (!match) {
+                res.status(401).json({ error: 'Password did not match!' });
+                return;
+            }
+            // Authentication successful
+            res.status(200).json({ success: true,  message: 'Authentication successful' });
+        }catch(error){
+            console.error('Error comparing admin passwords:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
+
     })
 })
 
@@ -112,42 +302,7 @@ app.post('/api/updateUser', (req, res)=>{
 
 })
 
-// API endpoint to fetch cars from the 'car' table
-app.get('/api/getCars', (req, res) => {
-  // SQL query to select all cars from the 'car' table
-  const sql = 'SELECT * FROM car, location WHERE car.locationID = location.locationID';
 
-  // Perform SQL database query
-  db.query(sql, (err, result) => {
-    if (err) {
-      console.error('Error fetching cars from MySQL:', err.message);
-      res.status(500).json({ error: 'Internal Server Error' });
-    } else {
-      console.log('Cars fetched from MySQL:', result);
-      res.json(result);
-    }
-  });
-});
-
-
-app.get('/api/getCar', (req, res)=>{
-    
-    const vehicleNo = req.query.vehicleNo;
-
-    const sql = `SELECT * FROM car, location WHERE car.vehicleNo = ? AND car.locationID = location.locationID`
-
-
-    // Perform SQL database query
-    db.query(sql,[vehicleNo] ,(err, result) => {
-        if (err) {
-        console.error(`Error fetching car with ID ${vehicleNo}  from MySQL:`, err.message);
-        res.status(500).json({ error: 'Internal Server Error' });
-        } else {
-        console.log('Cars fetched from MySQL:', result);
-        res.json(result);
-        }
-    });
-})
 
 app.get('/api/checkAvailability', (req, res)=>{
     const carID = req.query.carID
@@ -409,6 +564,9 @@ app.get('/api/getAllTrips',async(req, res)=>{
         res.status(500).json({ success: false, error: 'Internal Server Error' });
     }
 })
+
+
+
   
 
 // Start the server
