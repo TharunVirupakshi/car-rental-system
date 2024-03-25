@@ -60,97 +60,7 @@ const AddCouponModal = ({closeModal, refresh}) =>{
   )
 }
 
-const EditModal = ({id, closeModal, refresh}) =>{
-  const [data, setData] = useState({
-    couponCode: '',
-    discountPercent: 0.0,
-  });
 
-  const [curData, setcurData] = useState(null)
-
-  useEffect(()=>{
-    const fetch = async() => {
-      try {
-        const data = await APIService.getCoupon(id)
-        console.log('Fetched coupon', data)
-        setcurData(data[0])
-        // setData(prev => ({...prev, : data[0].vehicleNo}))
-      } catch (error) {
-        console.error('Error fetching coupon:', error.message);
-      }
-    }
-
-    fetch()
-  }, [id])
-
-
-  const handleData = (e) => {
-    
-    setData(prev => (
-      {
-        ...prev,
-        [e.target.name] : e.target.value
-      }
-    ))
-  }
-
-  const handleSubmit = async() => {
-      try {
-        // await APIService.updateCoupon(data)
-        alert('Saved!')
-        refresh()
-        closeModal()
-      } catch (error) {
-        console.log(error)
-      }
-  }
-
-  const handleDelete = async() => {
-    const confirmDelete = window.confirm("Are you sure you want to delete this coupon?");
-  if (confirmDelete) {
-    try {
-      await APIService.deleteCoupon(curData?.discountID);
-      alert('Coupon deleted successfully!');
-      refresh()
-      closeModal()
-    } catch (error) {
-      console.error(error);
-      alert('Failed to delete coupon. Please try again later.');
-    }
-  }
-  }
-
-
-  return(
-    <div className="space-y-6">
-            <h3 className="text-xl font-medium text-gray-900 dark:text-white">Update coupon: <span className='text-sm font-semibold'>{curData?.discountID ?? ''}</span></h3>
-           
-            <div>
-              <div className="mb-2 block">
-                <Label className='text-gray-500'  htmlFor="couponcode"  value={`Coupon Code: `} />
-                <span className='text-sm font-semibold'>{curData?.couponCode ?? ''}</span>
-              </div>
-              <TextInput placeholder='Enter new code' name='couponCode' id="couponCode" type="text" onChange={handleData} required/>
-            </div>
-            <div>
-              <div className="mb-2 block">
-                <Label className='text-gray-500' htmlFor="discountPerc" value={`Percent: `} />
-                <span className='text-sm font-semibold'>{curData?.discountPercent ?? ''}</span>
-              </div>
-              <TextInput  placeholder='Enter new percent' name='discountPercent' id="discountPercnt" type="text" onChange={handleData} required/>
-            </div>
-        
-            <div className="w-full flex gap-4">
-              <Button onClick={handleSubmit}>Update Coupon</Button>
-              <button onClick={handleDelete} data-modal-hide="popup-modal" type="button" class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center">
-                    Delete
-              </button>
-            </div>
-
-          </div>
-  )
-
-}
 
 const ManageDiscounts = () => {
   const [data, setData] = useState([])
@@ -188,6 +98,20 @@ const ManageDiscounts = () => {
   const handleEdit = (id) =>{
     setEditDiscountID(id)
     setOpenEditModal(true)
+  }
+
+  const handleDelete = async(discountID) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this coupon?");
+  if (confirmDelete) {
+    try {
+      await APIService.deleteCoupon({discountID});
+      alert('Coupon deleted successfully!');
+      refetchData()
+    } catch (error) {
+      console.error(error);
+      alert('Failed to delete coupon. Please try again later.');
+    }
+  }
   }
   return (
     <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
@@ -231,7 +155,7 @@ const ManageDiscounts = () => {
                 </td>
 
                 <td class="px-6 py-4">
-                    <button onClick={e => handleEdit(item?.couponCode)} class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</button>
+                    <button onClick={e => handleDelete(item?.discountID)} class="font-medium text-red-600 dark:text-red-500 hover:underline">Delete</button>
                 </td>
             
             </tr>
@@ -248,12 +172,6 @@ const ManageDiscounts = () => {
         </Modal.Body>
       </Modal>
 
-      <Modal show={openEditModal} size="lg" onClose={onCloseEditModal}  popup>
-        <Modal.Header />
-        <Modal.Body>
-          <EditModal id={editDiscountID} closeModal={onCloseEditModal} refresh={refetchData}/>
-        </Modal.Body>
-      </Modal>
 
     </div>
   )
