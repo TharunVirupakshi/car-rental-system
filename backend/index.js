@@ -4,9 +4,9 @@ const bodyParser = require('body-parser');
 const cors = require('cors')
 const bcrypt = require('bcrypt')
 
-// const CURRENT_DATE = new Date()
+const CURRENT_DATE = new Date()
 //Manipulate date for testing purpose
-const CURRENT_DATE = new Date('2024-03-27T12:00:00Z')
+// const CURRENT_DATE = new Date('2024-03-27T12:00:00Z')
 
 
 const app = express();

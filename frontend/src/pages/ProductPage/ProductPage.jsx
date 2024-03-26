@@ -11,11 +11,13 @@ const ProductPage = () => {
   const [ carData, setCarData] = useState([])
   const [isAvailable, setIsAvailable] = useState(false);
   const [ETRDate, setETRDate] = useState(null)
+  const [error, setError] = useState(null)
   console.log('(Prodpage) id:',productID)
   useEffect(() => {
 
     const fetchData = async () => {
       try {
+        setError(null)
         const data = await APIService.getCar(productID);
         const carStatus = await APIService.checkAvailability(productID)
         console.log('(ProdPage) car: ',  data);
@@ -24,7 +26,8 @@ const ProductPage = () => {
         setETRDate(carStatus.etrDate ?? null)
         setCarData(data[0]);
       } catch (error) {
-        console.error('(ProdPage) Error fetching car    :', error.message);
+        setError(error)
+        console.log('(ProdPage) Error fetching car:', error.message);
       }
     };
 
@@ -32,9 +35,14 @@ const ProductPage = () => {
   }, [])
 
 
+  if(error?.response?.status == 404 ?? false){
+    return(<div className='flex justify-center items-center h-screen'><h2 className="text-4xl font-extrabold dark:text-white">404 NOT FOUND</h2></div> )
+  }
+ 
 
   return (
     <div>
+
         <div className="product-container flex p-16 gap-10">
 
         <div className="img-container">
