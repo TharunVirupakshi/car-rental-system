@@ -72,22 +72,30 @@ app.post('/api/addCar', async(req, res)=>{
     if(vehicleNo === '' || carType === '' || model === ''){
        return res.status(400).json({ error: 'Missing required fields' }); 
     }
-
-    const sql = 'INSERT INTO car (vehicleNo, carType, model, locationID) VALUES(?,?,?,?)'
-
   
-    
-
-    // Perform SQL database insertion
-    db.query(sql,[vehicleNo, carType, model, locationID] , (err, result) => {
-        if (err) {
-            console.error(`Error adding car`, err.message);
-            res.status(500).json({ error: err.message });
-        } else {
-            console.log('added car!', result);
-            res.json({success: true, message: 'Added car!' });
+     // Check if the locationID has deleted_at set
+    const checkLocationQuery = 'SELECT * FROM location WHERE locationID = ? AND deleted_at IS NOT NULL';
+    db.query(checkLocationQuery, [locationID], (locationErr, locationResult) => {
+        if (locationErr) {
+            console.error('Error checking location:', locationErr.message);
+            return res.status(500).json({ error: locationErr.message });
         }
-    }); 
+
+        if (locationResult.length > 0) {
+            return res.status(400).json({ error: 'The location no longer exists, please add different location' });
+        }
+
+        // Proceed with inserting the car
+        const sql = 'INSERT INTO car (vehicleNo, carType, model, locationID) VALUES (?, ?, ?, ?)';
+        db.query(sql, [vehicleNo, carType, model, locationID], (err, result) => {
+            if (err) {
+                console.error(`Error adding car`, err.message);
+                return res.status(500).json({ error: err.message });
+            }
+            console.log('added car!', result);
+            res.json({ success: true, message: 'Added car!' });
+        });
+    });
 })
 
 app.put('/api/updateCar', async(req, res) =>{
@@ -107,6 +115,9 @@ app.put('/api/updateCar', async(req, res) =>{
               });
       }
 
+
+      
+
     // Construct the SQL query dynamically based on the fields sent
     let sql = 'UPDATE car SET ';
     const values = [];
@@ -123,6 +134,25 @@ app.put('/api/updateCar', async(req, res) =>{
     if (locationID) {
         sql += 'locationID=?, ';
         values.push(locationID);
+    }
+
+    if (locationID) {
+        // Check if the locationID exists and is not deleted
+        const checkLocationQuery = 'SELECT * FROM location WHERE locationID = ? AND deleted_at IS NULL';
+        db.query(checkLocationQuery, [locationID], (locationErr, locationResult) => {
+            if (locationErr) {
+                console.error('Error checking location:', locationErr.message);
+                return res.status(500).json({ error: 'Internal Server Error' });
+            }
+
+            if (locationResult.length === 0) {
+                return res.status(400).json({ error: 'The location is deleted or does not exist, please choose different location' });
+            }
+
+            // If location is valid, add locationID to the query
+            sql += 'locationID=?, ';
+            values.push(locationID);
+        })
     }
 
     // Remove the trailing comma and space
@@ -366,7 +396,7 @@ app.post('/api/createOrder', async(req, res)=>{
        
         // Assign tripAsst
           // Fetch a random assistant from the tripAsst table
-        const assignAsst = 'SELECT * FROM tripAsst ORDER BY RAND() LIMIT 1';
+        const assignAsst = 'SELECT * FROM tripAsst WHERE tripAsst.deleted_at IS NULL ORDER BY RAND() LIMIT 1';
 
         db.query(assignAsst, (err, result) => {
             if (err) {
