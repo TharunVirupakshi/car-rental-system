@@ -45,7 +45,7 @@ useEffect(() => {
   useEffect(()=>{
     const fetchData = async () => {
         try {
-          const data = await APIService.getUser(user?.uid);
+          const data = await APIService.getUser(auth.currentUser?.uid);
           setUserDetails(data[0])
           console.log('(ProfilePage) user: ',  data[0]);
 
