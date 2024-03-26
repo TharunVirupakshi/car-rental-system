@@ -173,16 +173,94 @@ const APIService = {
       } catch (error) {
         console.log('Error creating coupon: ', error.message)  
       }
+    },
+    getLocations: async() => {
+      try {
+        const res = await api.get('/api/getLocations')
+        return res.data
+      } catch (error) {
+        console.log('Error fetching locations: ', error.message)   
+      }
+    },
+    getLocation: async (locationID) => {
+      try {
+          const res = await api.get(`/api/getLocation?locationID=${locationID}`);
+          return res.data;
+      } catch (error) {
+          console.log('Error fetching location: ', error.message);
+      }
+    },
+    createLocation: async (locationData) => {
+        try {
+            const res = await api.post('/api/createLocation', locationData);
+            return res.data;
+        } catch (error) {
+            console.log('Error creating location: ', error.message);
+        }
+    },
+    updateLocation: async (locationData) => {
+        try {
+            const res = await api.put(`/api/updateLocation`, locationData);
+            return res.data;
+        } catch (error) {
+            console.log('Error updating location: ', error.message);
+        }
+    },
+    deleteLocation: async (locationID) => {
+        try {
+            const res = await api.delete(`/api/deleteLocation?locationID=${locationID}`);
+            return res.data;
+        } catch (error) {
+            console.log('Error deleting location: ', error.message);
+        }
     }
-    // updateCoupon: async({discountID, couponCode, discountPercent}) => {
-    //   try {
-    //     const res = await api.put('/api/updateCoupon', {discountID, couponCode, discountPercent})
-    //     return res.data
-    //   } catch (error) {
-    //     console.log('Error updating coupon!')
-    //   }
-    // }
     ,
+    getTripAssistants: async () => {
+    try {
+        const res = await api.get('/api/getTripAssistants');
+        return res.data;
+    } catch (error) {
+        console.log('Error fetching trip assistants: ', error.message);
+    }
+    },
+    getTripAssistant: async (asstID) => {
+        try {
+            const res = await api.get(`/api/getTripAssistant?asstID=${asstID}`);
+            return res.data;
+        } catch (error) {
+            console.log('Error fetching trip assistant: ', error.message);
+            
+        }
+    },
+    createTripAssistant: async (assistantData) => {
+        try {
+            const res = await api.post('/api/createTripAssistant', assistantData);
+            return res.data;
+        } catch (error) {
+            console.log('Error creating trip assistant: ', error.message);
+            
+        }
+    },
+    updateTripAssistant: async (assistantData) => {
+        try {
+            const res = await api.put(`/api/updateTripAssistant`,assistantData);
+            return res.data;
+        } catch (error) {
+            console.log('Error updating trip assistant: ', error.message);
+            
+        }
+    },
+    deleteTripAssistant: async (asstID) => {
+        try {
+            const res = await api.delete(`/api/deleteTripAssistant?asstID=${asstID}`);
+            return res.data;
+        } catch (error) {
+            console.log('Error deleting trip assistant: ', error.message);
+            
+        }
+    },
+
+    
     getDemand: async(date)=>{
       try {
         const response = await axios.get('http://172.17.13.160:5000/predict', {params:{new_date: date}})

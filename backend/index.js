@@ -268,6 +268,18 @@ app.post('/api/loginAdmin', (req, res) => {
 app.post('/api/updateUser', (req, res)=>{
     const {custID, name, contactNum, address} = req.body
 
+    if(!custID){ 
+        return res.status(400).json({ error: 'custID null or empty' });
+    }
+
+    if(!name && !contactNum && !address)
+        return res.status(400).json({ error: 'All values are missing or empty' });
+
+    // Validate contactNum
+    if (contactNum && !/^\d{10}$/.test(contactNum)) {
+        return res.status(400).json({ error: 'Invalid contact number format' });
+    }
+
      // Assuming you have a 'users' table in your database
      const sql = `
      UPDATE customer
@@ -423,7 +435,7 @@ app.get('/api/getCoupons', (req, res)=>{
 
     db.query(sql, (err, result)=>{
         if (err) {
-            console.error(`Error fetching coupon with code ${couponCode} from MySQL:`, err.message);
+            console.error(`Error fetching coupons:`, err.message);
             res.status(500).json({ error: 'Internal Server Error' });
         } else {
             if (result.length === 0) {
@@ -471,8 +483,6 @@ app.post('/api/createCoupon', (req, res) => {
     });
 })
 
-
-
 app.delete('/api/deleteCoupon', (req, res) => {
     const discountID = req.query.discountID
 
@@ -499,6 +509,338 @@ app.delete('/api/deleteCoupon', (req, res) => {
     });
 
 })
+
+
+// Location endpoints
+
+app.get('/api/getLocations', (req, res)=>{
+    
+    const sql = "SELECT * FROM location WHERE location.deleted_at IS NULL;"
+
+    db.query(sql, (err, result)=>{
+        if(err){
+            console.error(`Error fetching locations`, err.message);
+            res.status(500).json({ error: 'Internal Server Error' });
+        }else{
+            if (result.length === 0) {
+                // Coupon does not exist
+                console.log('Locations not found.');
+                res.status(404).json({ error: 'Locations not found' });
+            } else {
+                // Coupon exists
+                console.log('Locations found:', result);
+                res.json(result);
+            }
+        }
+        
+    })
+})
+
+app.get('/api/getLocation', (req, res) => {
+    const { locationID } = req.query;
+
+    const sql = "SELECT * FROM location WHERE location.locationID = ? AND location.deleted_at IS NULL;";
+    db.query(sql, [locationID], (err, result) => {
+        if (err) {
+            console.error(`Error fetching location: ${err.message}`);
+            res.status(500).json({ error: 'Internal Server Error' });
+        } else {
+            if (result.length === 0) {
+                // Location not found
+                console.log(`Location with ID ${locationID} not found.`);
+                res.status(404).json({ error: `Location with ID ${locationID} not found.` });
+            } else {
+                // Location found
+                console.log('Location found:', result);
+                res.json(result);
+            }
+        }
+    });
+});
+
+app.post('/api/createLocation', (req, res) => {
+    const { branchName, address } = req.body;
+
+    // Check if any of the required fields are missing
+    if (!branchName || !address) {
+        return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    // Construct the SQL query to insert a new location into the database
+    const sql = 'INSERT INTO location (branchName, address) VALUES (?, ?)';
+
+    // Execute the SQL query with the provided data
+    db.query(sql, [branchName, address], (err, result) => {
+        if (err) {
+            console.error('Error creating location:', err.message);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+        console.log('Location created successfully');
+        res.json({ success: true, message: 'Location created successfully' });
+    });
+});
+
+app.put('/api/updateLocation', (req, res) => {
+    const { locationID, branchName, address } = req.body;
+
+    if(!locationID) return res.status(400).json({ error: 'Location ID is null or empty' });
+    
+
+    // Check if any of the required fields are missing or empty strings
+    if (!branchName && !address) {
+        return res.status(400).json({ error: 'All values are Missing or empty' });
+    }
+
+
+    // Update the location in the database
+    let sql = 'UPDATE location SET '
+    const values = []
+
+    if (branchName) {
+        sql += 'branchName=?, ';
+        values.push(branchName);
+    }
+    if (address) {
+        sql += 'address=?, ';
+        values.push(address);
+    }
+
+    // Remove the trailing comma and space
+    sql = sql.slice(0, -2);
+
+    // Add the WHERE clause
+    sql += ' WHERE locationID=? AND deleted_at IS NULL;';  
+    values.push(locationID);
+
+
+    db.query(sql, values, (err, result) => {
+        if (err) {
+            console.error(`Error updating location: ${err.message}`);
+            res.status(500).json({ error: 'Internal Server Error' });
+        } else {
+            if (result.affectedRows === 0) {
+                // Location not found or already deleted
+                console.log(`Location with ID ${locationID} not found or already deleted.`);
+                res.status(404).json({ error: `Location with ID ${locationID} not found or already deleted.` });
+            } else {
+                // Location updated successfully
+                console.log(`Location with ID ${locationID} updated successfully.`);
+                res.json({ success: true, message: `Location with ID ${locationID} updated successfully.` });
+            }
+        }
+    });
+});
+
+app.delete('/api/deleteLocation', (req, res) => {
+    const { locationID } = req.query;
+
+    // Check if locationID is provided
+    if (!locationID) {
+        return res.status(400).json({ error: 'Missing locationID' });
+    }
+
+    // Construct the SQL query for soft deletion
+    const softDelete = `
+        UPDATE location
+        SET deleted_at = NOW()
+        WHERE locationID = ? AND deleted_at IS NULL;
+    `;
+
+    // Execute the SQL query to soft delete the location
+    db.query(softDelete, [locationID], (err, result) => {
+        if (err) {
+            console.error('Error deleting location:', err.message);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+
+        // Check if any rows were affected
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'Location not found or already deleted' });
+        }
+
+        console.log('Location deleted successfully');
+        res.json({ success: true, message: 'Location deleted successfully' });
+    });
+});
+
+
+
+// Staff endpoints
+
+app.post('/api/createTripAssistant', (req, res) => {
+    const { name, contactNum, email } = req.body;
+
+    // Check if any of the required fields are missing
+    if (!name || !contactNum || !email) {
+        return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    // Construct the SQL query for insertion
+    const sql = `
+        INSERT INTO tripAsst (name, contactNum, email)
+        VALUES (?, ?, ?);
+    `;
+
+    // Execute the SQL query to insert the new trip assistant
+    db.query(sql, [name, contactNum, email], (err, result) => {
+        if (err) {
+            console.error('Error creating trip assistant:', err.message);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+
+        console.log('Trip assistant created successfully');
+        res.json({ success: true, message: 'Trip assistant created successfully' });
+    });
+});
+
+app.get('/api/getTripAssistant', (req, res) => {
+    const { asstID } = req.query;
+
+    // Construct the SQL query to fetch trip assistant details
+    const sql = `
+        SELECT *
+        FROM tripAsst
+        WHERE asstID = ? AND deleted_at IS NULL;
+    `;
+
+    // Execute the SQL query to fetch the trip assistant
+    db.query(sql, [asstID], (err, result) => {
+        if (err) {
+            console.error('Error fetching trip assistant:', err.message);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+
+        // Check if the trip assistant exists
+        if (result.length === 0) {
+            return res.status(404).json({ error: 'Trip assistant not found' });
+        }
+
+        console.log('Trip assistant found:', result[0]);
+        res.json(result);
+    });
+});
+
+app.get('/api/getTripAssistants', (req, res) => {
+    // Construct the SQL query to fetch all trip assistants
+    const sql = `
+        SELECT *
+        FROM tripAsst
+        WHERE deleted_at IS NULL;
+    `;
+
+    // Execute the SQL query to fetch all trip assistants
+    db.query(sql, (err, result) => {
+        if (err) {
+            console.error('Error fetching trip assistants:', err.message);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+
+        // Check if any trip assistants were found
+        if (result.length === 0) {
+            return res.status(404).json({ error: 'No trip assistants found' });
+        }
+
+        console.log('Trip assistants found:', result);
+        res.json(result);
+    });
+});
+
+app.put('/api/updateTripAssistant', (req, res) => {
+    const { asstID, name, contactNum, email } = req.body;
+
+    if(!asstID) return res.status(400).json({ error: 'Assistant ID is null or empty' });
+    
+
+    // Check if any of the required fields are missing or empty strings
+    if (!name && !contactNum && !email) {
+        return res.status(400).json({ error: 'All values are Missing or empty' });
+    }
+
+
+    // Validate contactNum
+    if (contactNum && !/^\d{10}$/.test(contactNum)) {
+        return res.status(400).json({ error: 'Invalid contact number format' });
+    }
+
+    // Validate email
+    if (email && !/\S+@\S+\.\S+/.test(email)) {
+        return res.status(400).json({ error: 'Invalid email format' });
+    }
+
+    // Construct the SQL query for update
+    let sql = 'UPDATE tripAsst SET ';
+    const values = [];
+
+    if (name) {
+        sql += 'name=?, ';
+        values.push(name);
+    }
+    if (contactNum) {
+        sql += 'contactNum=?, ';
+        values.push(contactNum);
+    }
+    if (email) {
+        sql += 'email=?, ';
+        values.push(email);
+    }
+
+    // Remove the trailing comma and space
+    sql = sql.slice(0, -2);
+
+    // Add the WHERE clause
+    sql += ' WHERE asstID=? AND deleted_at IS NULL;';
+    values.push(asstID);
+
+    // Execute the SQL query to update the trip assistant
+    db.query(sql, values, (err, result) => {
+        if (err) {
+            console.error('Error updating trip assistant:', err.message);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+
+        // Check if any rows were affected
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'Trip assistant not found or already deleted' });
+        }
+
+        console.log('Trip assistant updated successfully');
+        res.json({ success: true, message: 'Trip assistant updated successfully' });
+    });
+});
+
+app.delete('/api/deleteTripAssistant', (req, res) => {
+    const { asstID } = req.query;
+
+    if(!asstID)  return res.status(400).json({ error: 'Asst ID is null or empty' });
+
+    // Construct the SQL query for soft deletion
+    const softDelete = `
+        UPDATE tripAsst
+        SET deleted_at = NOW()
+        WHERE asstID = ? AND deleted_at IS NULL;
+    `;
+
+    // Execute the SQL query to soft delete the trip assistant
+    db.query(softDelete, [asstID], (err, result) => {
+        if (err) {
+            console.error('Error deleting trip assistant:', err.message);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+
+        // Check if any rows were affected
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'Trip assistant not found or already deleted' });
+        }
+
+        console.log('Trip assistant deleted successfully');
+        res.json({ success: true, message: 'Trip assistant deleted successfully' });
+    });
+});
+
+
+
+
+
 
 
 
