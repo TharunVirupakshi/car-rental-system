@@ -28,6 +28,7 @@ const AuthPage = () => {
       navigate('/');
     } catch (error) {
       // Handle login errors (display error message, etc.)
+      setErrorMessage(error.message)
       console.error('Login error:', error.message);
     }
   };
@@ -35,6 +36,35 @@ const AuthPage = () => {
   const handleSignUp = async (e) => {
     e.preventDefault();
     try {
+         // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          setErrorMessage('Invalid Email format!');
+          return
+        }
+
+
+        // Check if name is provided
+        if (!name) {
+          setErrorMessage('Name is required');
+          return
+          }
+
+         // Validate contact number format, assuming a 10-digit number
+        const contactNumRegex = /^\d{10}$/;
+        if (!contactNumRegex.test(contact)) {
+          setErrorMessage('Invalid contact number format');
+          return
+        }
+
+
+
+        // Check if address is provided
+        if (!address) {
+          setErrorMessage('Address is required');
+          return
+        }
+
       const contactNum = contact
       await signUp({email, password, name, contactNum, address});
       // Redirect or perform other actions after successful sign-up
@@ -50,12 +80,16 @@ const AuthPage = () => {
 
 
   return (<>
-
-    {errorMessage && (
-            <Alert color="failure" icon={HiInformationCircle} className="fixed">
-              <span className="font-medium">Error!</span> {errorMessage}
-            </Alert>
-          )}
+      {errorMessage && (
+        <Alert color="failure" icon={HiInformationCircle} className="fixed">
+          <span className="font-medium">Error!</span> {errorMessage}
+          <button onClick={() => setErrorMessage(null)} className="ml-2 focus:outline-none">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M3.293 4.293a1 1 0 011.414 0L10 8.586l5.293-5.293a1 1 0 111.414 1.414L11.414 10l5.293 5.293a1 1 0 01-1.414 1.414L10 11.414l-5.293 5.293a1 1 0 01-1.414-1.414L8.586 10 3.293 4.707a1 1 0 010-1.414z" clipRule="evenodd" />
+            </svg>
+          </button>
+        </Alert>
+      )}
     <div className='flex w-screen h-screen justify-center'>
 
      

@@ -38,25 +38,7 @@ app.get('/', (req, res)=>{
     res.send('Hello...!')
 })
 
-// API endpoint to receive user details and store in SQL
-app.post('/api/store-user', (req, res) => {
-  const {custID, name, contactNum, email, address } = req.body;
-   
-  // SQL query to insert user details into the 'customer' table
-  const sql = 'INSERT INTO customer (custID, name, contactNum, email, address) VALUES (?, ?, ?, ?, ?)';
-  const values = [custID ,name, contactNum, email, address];
 
-  // Perform SQL database insertion
-  db.query(sql, values, (err, result) => {
-      if (err) {
-          console.error(`Error inserting user ${contactNum} details into MySQL:`, err.message);
-          res.status(500).json({ error: 'Internal Server Error' });
-      } else {
-          console.log('User details inserted into MySQL:', result);
-          res.json({ message: 'User details stored successfully' });
-      }
-  });
-});
 
 
 //Cars endpoints
@@ -243,7 +225,43 @@ app.get('/api/getCar', (req, res)=>{
 })
 
 
+// API endpoint to receive user details and store in SQL
+app.post('/api/store-user', (req, res) => {
+  const {custID, name, contactNum, email, address } = req.body;
+  
+  if(!custID)  return res.status(400).json({ error: 'cust ID is null or empty' }); 
 
+  if(!name || !contactNum || !email || !address)
+  return res.status(400).json({ error: 'One or more fields are missing' });
+  
+   // Regular expressions for email and contact number validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const contactNumRegex = /^\d{10}$/; // Assuming contact number is a 10-digit number
+  
+  // Validate email and contact number
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({ error: 'Invalid email format' });
+  }
+  
+  if (!contactNumRegex.test(contactNum)) {
+    return res.status(400).json({ error: 'Invalid contact number format' });
+  }
+  
+  const sql = 'INSERT INTO customer (custID, name, contactNum, email, address) VALUES(?,?,?,?,?);'
+
+  const values = [custID, name, contactNum, email, address]
+
+  // Perform SQL database insertion
+  db.query(sql, values, (err, result) => {
+      if (err) {
+          console.error(`Error inserting user ${contactNum} details into MySQL:`, err.message);
+          res.status(500).json({ error: 'Internal Server Error' });
+      } else {
+          console.log('User details inserted into MySQL:', result);
+          res.json({ message: 'User details stored successfully' });
+      }
+  });
+});
 
 app.get('/api/getUser', (req, res)=>{
     const custID = req.query.custID
@@ -310,39 +328,43 @@ app.post('/api/updateUser', (req, res)=>{
         return res.status(400).json({ error: 'Invalid contact number format' });
     }
 
-     // Assuming you have a 'users' table in your database
-     const sql = `
-     UPDATE customer
-     SET name = ?, contactNum = ?, address = ?
-     WHERE custID = ?
-    `;
+    
+    // Construct the SQL query dynamically based on the fields sent
+    let sql = 'UPDATE customer SET ';
+    const values = [];
 
-    const fetchUser = 'SELECT * FROM customer WHERE customer.custID = ?'
+    if (name) {
+        sql += 'name=?, ';
+        values.push(name);
+    }
+    if (contactNum) {
+        sql += 'contactNum=?, ';
+        values.push(contactNum);
+    }
+    if(address){
+        sql += 'address=?, ';
+        values.push(address)
+    }
 
-    db.query(fetchUser, [custID], (err, result)=>{
+     // Remove the trailing comma and space
+     sql = sql.slice(0, -2);
+
+    // Add the WHERE clause
+    sql += ' WHERE custID=? ;';
+    values.push(custID);
+
+  
+
+    db.query(sql, values, (err, result) => {
         if (err) {
-            console.error(`Error getting user ${custID}:`, err.message);
-            res.status(500).json({ error: 'Internal Server Error' });
-        } else {
-            console.log('User details:', result);
-            const user = result[0]
-            const values = [name ?? user.name, contactNum ?? user.contactNum, address ?? user.address, custID]
-
-            db.query(sql, values, (err, result) => {
-                if (err) {
-                    console.error(`Error updateing user ${custID}:`, err.message);
-                    res.status(500).json({ error: 'Internal Server Error' });
-                } else { 
-                    console.log('Updated!')  
-                    res.status(201).json({ success: true, result});    
-                }
-            })
-            
-        } 
+            console.error(`Error updating user ${custID}:`, err.message);
+            res.status(500).json({ error: err.message });
+        } else { 
+            console.log('Updated!')  
+            res.status(201).json({ success: true, result});    
+        }
     })
-
-   
-
+    
 
 
 })
