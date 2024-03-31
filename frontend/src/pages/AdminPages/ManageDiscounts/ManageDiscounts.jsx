@@ -38,7 +38,7 @@ const AddCouponModal = ({closeModal, refresh}) =>{
 
   return(
     <div className="space-y-6">
-            <h3 className="text-xl font-medium text-gray-900 dark:text-white">New car details</h3>
+            <h3 className="text-xl font-medium text-gray-900 dark:text-white">New coupon details</h3>
            
             <div>
               <div className="mb-2 block">

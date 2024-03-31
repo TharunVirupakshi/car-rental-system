@@ -263,7 +263,7 @@ const APIService = {
     
     getDemand: async(date)=>{
       try {
-        const response = await axios.get('http://172.17.13.160:5000/predict', {params:{new_date: date}})
+        const response = await axios.get('http://localhost:5000/predict', {params:{new_date: date}})
 
         console.log('Data from ML SERVER: ', response.data)
 

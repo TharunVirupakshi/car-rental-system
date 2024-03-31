@@ -35,7 +35,7 @@ const ProductPage = () => {
   }, [])
 
 
-  if(error?.response?.status == 404 ?? false){
+  if(error?.response?.status == 404){
     return(<div className='flex justify-center items-center h-screen'><h2 className="text-4xl font-extrabold dark:text-white">404 NOT FOUND</h2></div> )
   }
  
