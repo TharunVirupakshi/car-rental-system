@@ -74,8 +74,8 @@ const Order = () => {
     const fetchData = async () => {
       try {
         const data = await APIService.getDemand(startDate);
-        console.log('Demand ',  data.result[0]);
-        setDemand(data.result[0]);
+        console.log('Demand ',  data?.demand);
+        setDemand(data?.demand);
       } catch (error) {
         console.error('Error fetching demand:', error.message);
       }
@@ -116,12 +116,20 @@ const Order = () => {
 
   const handleStartDateChange = (date) => {
     setStartDate(date);
+    if (endDate < date) {
+    // If end date is less than start date, set end date same as start date
+    setEndDate(date);
+    }
   };
 
   const handleEndDateChange = (date) => {
+  if (date < startDate) {
+    // If end date is less than start date, set end date same as start date
+    setEndDate(startDate);
+  } else {
     setEndDate(date);
-
-  };
+  }
+};
   
   const handleCreateOrder = ()=>{
     const makeReq = async () => {
@@ -228,7 +236,7 @@ const Order = () => {
               <div className="my-5 block">
               <Label htmlFor="end" value="Return" />
               </div>
-              <Datepicker name='end' minDate={startDate || new Date()} autoHide={true} onSelectedDateChanged={handleEndDateChange}/>
+              <Datepicker value={endDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} name='end' minDate={startDate || new Date()} autoHide={true} onSelectedDateChanged={handleEndDateChange}/>
 
 
 
