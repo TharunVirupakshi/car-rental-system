@@ -95,8 +95,8 @@ const Order = () => {
 
   //Apply Discount
   useEffect(()=>{
-    const cost = couponDetails ? estimatedPrice-(estimatedPrice*(couponDetails.discountPercent || 0.0)) : estimatedPrice
-    setTotalCost(cost)
+    const cost = couponDetails ? (estimatedPrice - (estimatedPrice * (couponDetails.discountPercent || 0.0))).toFixed(2) : estimatedPrice;
+    setTotalCost(cost);
   },[estimatedPrice, couponDetails])
 
   const calculateDaysBetween = (start, end) => {
