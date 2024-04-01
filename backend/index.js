@@ -6,7 +6,7 @@ const bcrypt = require('bcrypt')
 
 const CURRENT_DATE = new Date()
 //Manipulate date for testing purpose
-// const CURRENT_DATE = new Date('2024-03-27T12:00:00Z')
+// const CURRENT_DATE = new Date('2024-04-02T12:00:00Z')
 
 
 const app = express();
@@ -43,7 +43,7 @@ app.get('/', (req, res)=>{
 
 //Cars endpoints
 app.post('/api/addCar', async(req, res)=>{
-    const {vehicleNo, carType, model, locationID } = req.body
+    const {vehicleNo, carType, model, locationID, photoUrl } = req.body
     
     console.log('add car', req.body)
      // Check if any of the values are empty strings
@@ -68,8 +68,8 @@ app.post('/api/addCar', async(req, res)=>{
         }
 
         // Proceed with inserting the car
-        const sql = 'INSERT INTO car (vehicleNo, carType, model, locationID) VALUES (?, ?, ?, ?)';
-        db.query(sql, [vehicleNo, carType, model, locationID], (err, result) => {
+        const sql = 'INSERT INTO car (vehicleNo, carType, model, locationID, photoUrl) VALUES (?, ?, ?, ?, ?)';
+        db.query(sql, [vehicleNo, carType, model, locationID, photoUrl], (err, result) => {
             if (err) {
                 console.error(`Error adding car`, err.message);
                 return res.status(500).json({ error: err.message });
@@ -393,7 +393,7 @@ app.get('/api/checkAvailability', (req, res)=>{
             res.status(500).json({ error: 'Internal Server Error' });
         } else {
             const latestRentalEndDate = result[0]?.rentalEndDate;
-           
+            console.log('Fetched end date before:', latestRentalEndDate)
              // Convert UTC to local timezone
              const localLatestRentalEndDate = new Date(latestRentalEndDate + 'Z');
 
@@ -401,9 +401,12 @@ app.get('/api/checkAvailability', (req, res)=>{
 
              console.log('Fetched end date:', localLatestRentalEndDate)
              console.log('Curent date:', CURRENT_DATE)
+             var isAvailable = true;
+            if(latestRentalEndDate)
+            isAvailable =  new Date(localLatestRentalEndDate).toLocaleDateString() < CURRENT_DATE.toLocaleDateString();
 
-             const isAvailable = !latestRentalEndDate || new Date(localLatestRentalEndDate).toLocaleDateString() < CURRENT_DATE.toLocaleDateString();
- 
+            console.log('Availability: ', isAvailable);
+            console.log('Availability: ', isAvailable)
              res.json({ carID,etrDate : localLatestRentalEndDate, isAvailable });
         }
     });

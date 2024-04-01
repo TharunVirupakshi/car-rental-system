@@ -9,10 +9,11 @@ const AddCarModal = ({closeModal, refresh}) =>{
     vehicleNo: '',
     model: '',
     carType: '',
+    photoUrl: '',
     locationID: null
   });
 
-
+  const [imageUrl, setImageUrl] = useState('');
 
   const handleData = (e) => {
     
@@ -26,9 +27,30 @@ const AddCarModal = ({closeModal, refresh}) =>{
   
   // useEffect(()=>     console.log('data:', data), [data])
 
+   // Function to handle image upload
+   const handleImageUpload = (event) => {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+      const url = e.target.result;
+      const imageUrl = URL.createObjectURL(file);
+      setImageUrl(imageUrl);
+      setData(prev => (
+      {
+        ...prev,
+        photoUrl : imageUrl
+      }
+    ))
+    };
+
+    // Read the image file as a data URL
+    reader.readAsDataURL(file);
+  };
 
   const handleSubmit = async() => {
       try {
+        console.log("Submitting... ", data)
         const res = await APIService.addCar(data)
         if(res?.success ?? false){
           alert('Car Added!')
@@ -67,6 +89,12 @@ const AddCarModal = ({closeModal, refresh}) =>{
                 <Label htmlFor="location" value="Location ID" />
               </div>
               <TextInput name='locationID' id="location" type="number" onChange={handleData} required/>
+            </div>
+            <div>
+              <div className="mb-2 block">
+                <Label htmlFor="photo" value="Photo" />
+              </div>
+              <TextInput name='photoUrl' id="photoUrl" type="file" onChange={handleImageUpload} accept="image/*" required/>
             </div>
             {/* <div className="flex justify-between">
               <div className="flex items-center gap-2">

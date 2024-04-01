@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button, Checkbox, Label, TextInput } from 'flowbite-react';
 import { Alert } from 'flowbite-react';
 import { HiInformationCircle } from 'react-icons/hi';
+import './authpage.css'
 
 
 const AuthPage = () => {
@@ -90,7 +91,7 @@ const AuthPage = () => {
           </button>
         </Alert>
       )}
-    <div className='flex w-screen h-screen justify-center'>
+    <div className='loginPage flex w-screen h-screen justify-center'>
 
      
 
