@@ -81,17 +81,19 @@ app.post('/api/addCar', async(req, res)=>{
 })
 
 app.put('/api/updateCar', async(req, res) =>{
-    const {vehicleNo, carType, model, locationID } = req.body
+    const {vehicleNo, carType, model, locationID, photoUrl } = req.body
+
+    console.log('[UPDATE CAR]: ', req.body)
 
      // Check if any fields are sent in the request body
-     if (!carType && !model && !locationID) {
+     if (!carType && !model && !locationID && !photoUrl) {
         return res.status(400).json({ error: 'No fields to update' });
     }
 
       // Validate that none of the fields are empty
       if ((carType && carType.trim() === '') ||
           (model && model.trim() === '') ||
-          (locationID && locationID.trim() === '')) {
+          (locationID && locationID === '')) {
               return res.status(400).json({
                   error: 'Fields cannot be empty'
               });
@@ -113,10 +115,8 @@ app.put('/api/updateCar', async(req, res) =>{
         sql += 'model=?, ';
         values.push(model);
     }
-    if (locationID) {
-        sql += 'locationID=?, ';
-        values.push(locationID);
-    }
+
+
 
     if (locationID) {
         // Check if the locationID exists and is not deleted
@@ -137,6 +137,10 @@ app.put('/api/updateCar', async(req, res) =>{
         })
     }
 
+    if (photoUrl){
+        sql += 'photoUrl=?, ';
+        values.push(photoUrl);
+    }
     // Remove the trailing comma and space
     sql = sql.slice(0, -2);
 

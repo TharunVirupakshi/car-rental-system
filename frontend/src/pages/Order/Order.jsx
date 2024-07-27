@@ -87,8 +87,8 @@ const Order = () => {
   useEffect(()=>{
     const rate = demand!=0 ? RATE_PER_DAY+RATE_PER_DAY*(demand/100) : RATE_PER_DAY
     const price = (days * rate).toFixed(2);
-
-    setEstimatedPrice(price)
+    const finalPrice = isNaN(price) ? RATE_PER_DAY * days : price;
+    setEstimatedPrice(finalPrice)
   },[days, demand])
 
 

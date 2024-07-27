@@ -91,15 +91,15 @@ const AuthPage = () => {
           </button>
         </Alert>
       )}
-    <div className='loginPage flex w-screen h-screen justify-center'>
+    <div className='loginPage flex w-screen h-screen pl-40'>
 
      
 
        <form className="flex flex-col gap-4 w-96 my-16">
-       <h1 className="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white">Welcome!</h1>
+       <h1 className="mb-2 text-xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-5xl dark:text-white">Find Your Ride, Start Your Adventure!</h1>
         {isSignUp ? (
           <div>
-            <div className="my-2 block">
+            <div className="my-1 block">
               <Label htmlFor="email1" value="Email" />
             </div>
             <TextInput

@@ -1,27 +1,38 @@
 import React from 'react'
 import { Link } from 'react-router-dom';
 import { Card } from 'flowbite-react';
-import carImage from '../../assets/maruti-suzuki-fronx-splendid-silver-with-bluish-black.jpg'
+import NO_IMAGE from '../../assets/car_no_image_small.jpg'
 import { useState } from 'react';
 import { useEffect } from 'react';
 import APIService from '../../middleware/APIService';
 import { RATE_PER_DAY } from '../../constants';
+
+import './ProductCard.css'
+
 const ProductCard = ({product}) => {
+
+  const [car, setCar] = useState(null);
+
+  useEffect(()=>{
+    setCar(product);
+  }, [product]);
+
 
   return (
     <Card
       className="max-w-sm"
-      imgAlt="Apple Watch Series 7 in colors pink, silver, and black"
-      imgSrc={carImage}
+      renderImage={() => <div className='card-img-container'><img src={car?.photoUrl ?? NO_IMAGE} /></div>}
+      // imgAlt="Apple Watch Series 7 in colors pink, silver, and black"
+      // imgSrc={car?.photoUrl ?? NO_IMAGE}
     >
       <a href="#">
         <h5 className="text-xl font-semibold tracking-tight text-gray-900 dark:text-white">
-          {product.model ?? 'Car Name'}
+          {car?.model ?? 'Car Name'}
         </h5>
       </a>
 
       <h5 className="text-lg font-semibold tracking-tight text-gray-900 dark:text-white">
-          {product.branchName ?? 'Location'}
+          {car?.branchName ?? 'Location'}
         </h5>
 
 
@@ -82,7 +93,7 @@ const ProductCard = ({product}) => {
         </span>
       </div>
         <Link
-        to={`/product/${product.vehicleNo}`}
+        to={`/product/${car?.vehicleNo}`}
         className="rounded-lg bg-cyan-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-cyan-800 focus:outline-none focus:ring-4 focus:ring-cyan-300 dark:bg-cyan-600 dark:hover:bg-cyan-700 dark:focus:ring-cyan-800"
       >
         Rent

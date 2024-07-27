@@ -1,7 +1,10 @@
 import {useState, useMemo, useEffect } from 'react'
 import APIService from '../../../middleware/APIService';
 import { Button, Checkbox, Label, Modal, TextInput } from "flowbite-react";
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { storage } from '../../../firebase/firebase';
 import { async } from '@firebase/util';
+import NO_IMAGE_PHOTO from '../../../assets/car_no_image_small.jpg'
 
 
 const AddCarModal = ({closeModal, refresh}) =>{
@@ -14,6 +17,7 @@ const AddCarModal = ({closeModal, refresh}) =>{
   });
 
   const [imageUrl, setImageUrl] = useState('');
+  const [imageFile, setImageFile] = useState(null);
 
   const handleData = (e) => {
     
@@ -26,39 +30,55 @@ const AddCarModal = ({closeModal, refresh}) =>{
   }
   
   // useEffect(()=>     console.log('data:', data), [data])
-
-   // Function to handle image upload
-   const handleImageUpload = (event) => {
+  // Function to handle image selection
+  const handleImageSelect = (event) => {
     const file = event.target.files[0];
-    const reader = new FileReader();
+    if (file) {
+      setImageFile(file);
+      const url = URL.createObjectURL(file);
+      console.log('Image selected: ', url);
+      setImageUrl(url);
+    }
+  };
+   // Function to handle image upload
+   const uploadImage = async() => {
+    if (!imageFile) return;
 
-    reader.onload = (e) => {
-      const url = e.target.result;
-      const imageUrl = URL.createObjectURL(file);
-      setImageUrl(imageUrl);
-      setData(prev => (
-      {
-        ...prev,
-        photoUrl : imageUrl
-      }
-    ))
-    };
-
-    // Read the image file as a data URL
-    reader.readAsDataURL(file);
+    const storageRef = ref(storage, `images/${imageFile.name}`);
+    try {
+      // Upload the file
+      const snapshot = await uploadBytes(storageRef, imageFile);
+      // Get the download URL
+      const url = await getDownloadURL(snapshot.ref);
+      return url;
+    } catch (error) {
+      console.error("Error uploading image: ", error);
+      throw new Error("Failed to upload image. Please try again."); // Throw a new error
+    }
   };
 
   const handleSubmit = async() => {
       try {
-        console.log("Submitting... ", data)
-        const res = await APIService.addCar(data)
+        let imageUrl = '';
+        if (imageFile) {
+          imageUrl = await uploadImage(); // Ensure image is uploaded before submitting
+        }
+         // Directly include the photoUrl in the data object
+        const carData = {
+          ...data,
+          photoUrl: imageUrl,
+        };
+
+        console.log("Submitting... ", carData)
+        const res = await APIService.addCar(carData)
         if(res?.success ?? false){
           alert('Car Added!')
         }
         refresh()
         closeModal()
       } catch (error) {
-        console.log(error)
+        console.log(error);
+        alert(error.message);
       }
   }
 
@@ -94,7 +114,7 @@ const AddCarModal = ({closeModal, refresh}) =>{
               <div className="mb-2 block">
                 <Label htmlFor="photo" value="Photo" />
               </div>
-              <TextInput name='photoUrl' id="photoUrl" type="file" onChange={handleImageUpload} accept="image/*" required/>
+              <TextInput name='photoUrl' id="photoUrl" type="file" onChange={handleImageSelect} accept="image/*" required/>
             </div>
             {/* <div className="flex justify-between">
               <div className="flex items-center gap-2">
@@ -123,8 +143,11 @@ const EditModal = ({id, closeModal, refresh}) =>{
     vehicleNo: '',
     model: '',
     carType: '',
-    locationID: null
+    locationID: null,
+    photoUrl: '',
   });
+  const [imageFile, setImageFile] = useState(null);
+  const [imageUrl,setImageUrl] = useState('');
 
   const [curCar, setCurCar] = useState(null)
 
@@ -143,7 +166,32 @@ const EditModal = ({id, closeModal, refresh}) =>{
     fetch()
   }, [id])
 
+  const handleImageSelect = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setImageFile(file);
+      const url = URL.createObjectURL(file);
+      console.log('Image selected: ', url);
+      setImageUrl(url);
+      setCurCar(prev => ({...prev, photoUrl : url}));
+    }
+  };
+    // Function to handle image upload
+    const uploadImage = async() => {
+    if (!imageFile) return;
 
+    const storageRef = ref(storage, `images/${imageFile.name}`);
+    try {
+      // Upload the file
+      const snapshot = await uploadBytes(storageRef, imageFile);
+      // Get the download URL
+      const url = await getDownloadURL(snapshot.ref);
+      return url;
+    } catch (error) {
+      console.error("Error uploading image: ", error);
+      throw new Error("Failed to upload image. Please try again."); // Throw a new error
+    }
+  }; 
   const handleData = (e) => {
     
     setData(prev => (
@@ -156,7 +204,17 @@ const EditModal = ({id, closeModal, refresh}) =>{
 
   const handleSubmit = async() => {
       try {
-        await APIService.updateCar(data)
+        let imageUrl = '';
+        if (imageFile) {
+          imageUrl = await uploadImage(); // Ensure image is uploaded before submitting
+        }
+         // Directly include the photoUrl in the data object
+        const carData = {
+          ...data,
+          photoUrl: imageUrl,
+        };
+        console.log('Details: ', carData)
+        await APIService.updateCar(carData)
         alert('Saved!')
         refresh()
         closeModal()
@@ -185,6 +243,13 @@ const EditModal = ({id, closeModal, refresh}) =>{
     <div className="space-y-6">
             <h3 className="text-xl font-medium text-gray-900 dark:text-white">Update car : <span className='text-sm font-semibold'>{curCar?.vehicleNo ?? ''}</span></h3>
            
+            <div className="img-container">
+              <img src={curCar?.photoUrl ?? NO_IMAGE_PHOTO} alt=""/>
+            </div>
+
+            <div className="w-full flex gap-4">
+            <TextInput name='photoUrl' id="photoUrl" type="file" onChange={handleImageSelect} accept="image/*" required/>
+            </div>
             <div>
               <div className="mb-2 block">
                 <Label className='text-gray-500'  htmlFor="model"  value={`Model: `} />

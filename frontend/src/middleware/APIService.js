@@ -121,9 +121,9 @@ const APIService = {
         throw error;    
       }
     },
-    addCar: async({vehicleNo, model, carType, locationID}) => {
+    addCar: async({vehicleNo, model, carType, locationID, photoUrl}) => {
       try {
-        const response = await api.post('/api/addCar', {vehicleNo, model, carType, locationID})
+        const response = await api.post('/api/addCar', {vehicleNo, model, carType, locationID, photoUrl})
         console.log('Added car!')
 
         return response.data
@@ -132,13 +132,13 @@ const APIService = {
         console.error('Error adding car:', error.message);  
       }
     },
-    updateCar: async({vehicleNo, model, carType, locationID}) => {
+    updateCar: async({vehicleNo, model, carType, locationID, photoUrl}) => {
       try {
-        await api.put('/api/updateCar', {vehicleNo, model, carType, locationID})
+        await api.put('/api/updateCar', {vehicleNo, model, carType, locationID, photoUrl})
         console.log('Updated!')
       } catch (error) {
         console.error('Error updating car:', error.message);   
-
+        
       }
     }
     ,
