@@ -64,42 +64,42 @@ RentCarz is a comprehensive car rental system designed to streamline the process
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/your-username/RentCarz.git
-   cd RentCarz
+   git clone https://github.com/your-username/car-rental-system.git
+   cd car-rental-system
    ```
 
 2. **Install server dependencies:**
    ```bash
-   cd server
+   cd backend
    npm install
    ```
 
 3. **Install client dependencies:**
    ```bash
-   cd ../client
+   cd ../frontend
    npm install
    ```
 
 4. **Set up MySQL database:**
-   - Create a new database in MySQL.
-   - Update the database configuration in `server/config/db.js` with your MySQL credentials.
+   - Create a new database in MySQL using the file `backend/files/DB_SCHEMA.sql`.
+   - Update the database configuration with your MySQL credentials.
 
 5. **Run the server:**
    ```bash
-   cd ../server
+   cd ../backend
    npm start
    ```
 
 6. **Run the client:**
    ```bash
-   cd ../client
-   npm start
+   cd ../frontend
+   npm run dev
    ```
 
 ### Usage
 
 1. **Navigate to the client:**
-   Open your web browser and go to `http://localhost:3000`.
+   Open your web browser and go to `http://localhost:5173`.
    
 2. **Register and log in:**
    Create a new user account or log in with existing credentials.
@@ -121,10 +121,3 @@ We welcome contributions to enhance the RentCarz project. To contribute, please 
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Acknowledgments
-
-- Special thanks to the open-source community for providing valuable tools and resources.
-
----
-
-Feel free to customize this README file further based on your project's specific details and requirements.
