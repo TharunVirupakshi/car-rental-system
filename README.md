@@ -13,11 +13,16 @@ RentCarz is a comprehensive car rental system designed to streamline the process
 - Users can log in using their credentials.
 
 ### Vehicle Inventory Management
+<img width="1280" alt="Screenshot 2024-07-27 at 4 24 09 PM" src="https://github.com/user-attachments/assets/c9c0ead4-8469-4f18-8a66-40dbab7da334">
+
 - Admins can add, edit, or remove vehicles.
 - Vehicles are categorized and listed with details like type, availability, and price.
 - Vehicle availability is automatically updated post-booking or return.
 
 ### Booking and Reservation System
+<img width="480" alt="Screenshot 2024-07-27 at 4 26 52 PM" src="https://github.com/user-attachments/assets/bc4bb43b-36cf-4d69-88ea-7584d1d0988e">
+<img width="480" alt="Screenshot 2024-07-27 at 4 27 28 PM" src="https://github.com/user-attachments/assets/eba69790-e5b5-4982-a2ce-5cd9ef712010">
+
 - Users can specify rental dates and hours to find available vehicles.
 - Real-time availability and pricing predictions are provided.
 - Users can select and book vehicles directly.
@@ -27,10 +32,14 @@ RentCarz is a comprehensive car rental system designed to streamline the process
 - Predictions account for external factors like holidays and weather.
 
 ### User Interface and Experience
+<img width="1280" alt="Screenshot 2024-07-27 at 4 29 39 PM" src="https://github.com/user-attachments/assets/ab3a9282-562b-44c5-a20c-cd9d0daa01ad">
+
 - The system offers a user-friendly interface for easy navigation and booking.
 - Detailed vehicle information and photos are provided.
 
 ### Payment and Transactions
+<img width="1280" alt="Screenshot 2024-07-27 at 4 30 59 PM" src="https://github.com/user-attachments/assets/60eacab1-69b4-4627-bfdc-3c2343e6aba0">
+
 - Users can complete payments using various methods (credit/debit cards, online wallets, etc.).
 - Users receive transaction receipts and rental agreement details.
 
